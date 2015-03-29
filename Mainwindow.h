@@ -1,3 +1,5 @@
+
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -35,8 +37,9 @@ public slots:
     void    s_save        ();
     void    s_saveAs      ();
     void    s_quit        ();
-
-    void    isClicked     ();
+    void    s_SetCentroid();
+    void    s_SetRotate();
+    void    s_SetScale();
 
 private:
      //****Create Menu****
@@ -45,6 +48,7 @@ private:
      //****Create Actions****
      void createActionsFile ();
 
+     //***Layout for Left Side***
      void leftLayout();
 
      //****QAction for File****

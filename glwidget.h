@@ -1,4 +1,5 @@
 
+
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
@@ -17,15 +18,17 @@ public:
      GLWidget(QWidget *parent = 0);
     ~GLWidget();
 
-    void  isClicked();
     void  setTiles(vector<Tile> &);
+    void  setTimer();
     void  drawTiles();
-
-    bool clicked = false;
+    bool  mFlagCentroid;
+    bool  mFlagRotate;
+    bool  mFlagScale;
 
 signals:
 
 public slots:
+    void s_Play();
 
 protected:
     void initializeGL();
@@ -33,7 +36,11 @@ protected:
     void resizeGL(int width, int height);
 
 private:
-    vector<Tile>	m_tiles;
+    vector<Tile>	mTiles;
+
+    bool            mPlay;
+
+    QTimer          *mTimer;
 };
 
 #endif	// GLWIDGET_H

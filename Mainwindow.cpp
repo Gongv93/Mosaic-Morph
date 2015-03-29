@@ -62,6 +62,9 @@ void MainWindow::createMenuFile()
 
 void MainWindow::leftLayout()
 {
+    // Create widget; set it to be app's central widget
+    m_glwidget = new GLWidget;  // widget for OpenGL drawing
+
     //Making Horizontal Slider
     QSlider *slider = new QSlider(Qt::Horizontal);
     slider ->setMinimum(1);
@@ -78,10 +81,26 @@ void MainWindow::leftLayout()
     m_LoadButton = new QPushButton("Load");
     m_playPause  = new QPushButton("Play/Pause");
 
+    //Load Button Signal-Slot Connection
+    connect(m_LoadButton, SIGNAL(clicked()), this, SLOT(s_loadTiles()));
+
+    // Play button signal-slot connection
+    connect(m_playPause, SIGNAL(clicked()), m_glwidget, SLOT(s_Play()));
+
     //Creating Checked Boxes
     m_scaleTiles  = new QCheckBox("Scale Tiles");
     m_rotateTiles = new QCheckBox("Rotate Tiles");
     m_showCent    = new QCheckBox("Show Centroid");
+
+    // Check box signal-slot connection
+    connect(m_showCent,SIGNAL(stateChanged(int)), this, SLOT(s_SetCentroid()));
+    connect(m_rotateTiles,SIGNAL(stateChanged(int)), this, SLOT(s_SetRotate()));
+    connect(m_scaleTiles,SIGNAL(stateChanged(int)), this, SLOT(s_SetScale()));
+
+    // Set inital checkbox as unchecked
+    m_showCent->setChecked(false);
+    m_rotateTiles->setChecked(true);
+    m_scaleTiles->setChecked(true);
 
     //Placing the Components:
     //1. Adding the Pushbuttons to a HBox
@@ -108,9 +127,6 @@ void MainWindow::leftLayout()
     leftVLayout -> addLayout(HorzSlider);
     leftVLayout ->addStretch();
 
-    // Create widget; set it to be app's central widget
-    m_glwidget = new GLWidget;	// widget for OpenGL drawing
-
     //4.Adding all widgets and OpenGl Drawing to a Horz Lay
     QHBoxLayout *HorzLayout = new QHBoxLayout;
     HorzLayout -> addLayout(leftVLayout);
@@ -122,29 +138,23 @@ void MainWindow::leftLayout()
     QWidget *window = new QWidget;
     window ->setLayout(HorzLayout);
     setCentralWidget(window);
-
-
-
-    //Signal Slot Connections
-
-    //Load Button Signal-Slot Connection
-    connect(m_LoadButton,SIGNAL(clicked()),this, SLOT(s_loadTiles()));
-    connect(m_showCent,SIGNAL(clicked()), this, SLOT(isClicked()));
-
-    //Slider Signal-Slot Connection
-   //  connect(slider, SIGNAL(valueChanged()),this, SLOT(..));
-
 }
-
-void MainWindow::isClicked() 
-{
-    m_glwidget->clicked = m_showCent->isChecked();
-    m_glwidget->setTiles(m_tiles);
-}
-
-
 
 //Slot Functions
+void MainWindow::s_SetCentroid()
+{
+    m_glwidget->mFlagCentroid = m_showCent->isChecked();
+}
+void MainWindow::s_SetRotate()
+{
+
+}
+void MainWindow::s_SetScale()
+{
+
+}
+
+
 void  MainWindow::s_loadTiles ()
 {
     // launch file dialog and get file containing tile geometry
@@ -214,6 +224,7 @@ void  MainWindow::s_loadTiles ()
 
         // assign m_tiles to the OpenGL widget
         m_glwidget->setTiles(m_tiles);
+        //m_glwidget->setTimer();
 
 }
 
@@ -228,9 +239,5 @@ void MainWindow::s_quit()
 {
    exit(0);
 }
-
-
-
-
 
 

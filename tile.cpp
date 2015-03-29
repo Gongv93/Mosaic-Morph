@@ -1,3 +1,5 @@
+
+
 // ======================================================================
 //
 // Tile.cpp - Tile class
@@ -25,7 +27,7 @@ void Tile::setRandColor()
 
 void Tile::setCentroid()
 {
-    int i; 
+    int i;
     float x = 0.0, y = 0.0;
 
     // Summing up the x and y coords
@@ -34,7 +36,7 @@ void Tile::setCentroid()
         y += m_vertices[i].y();
     }
 
-    // Setting the centroids 
+    // Setting the centroids
     m_centroid.setX(x/m_num);
     m_centroid.setY(y/m_num);
 }
