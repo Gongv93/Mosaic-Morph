@@ -32,14 +32,15 @@ public:
 
 public slots:
 
-    /*******  FILE  ********/
-    void    s_loadTiles   ();
-    void    s_save        ();
-    void    s_saveAs      ();
-    void    s_quit        ();
-    void    s_SetCentroid();
-    void    s_SetRotate();
-    void    s_SetScale();
+     /*** Slot Functions  ***/
+     void    s_loadTiles   ();
+     void    s_save        ();
+     void    s_saveAs      ();
+     void    s_quit        ();
+
+     void    s_SetCentroid ();
+     void    s_SetRotate   ();
+     void    s_SetScale    ();
 
 private:
      //****Create Menu****
@@ -59,7 +60,7 @@ private:
      QAction*     m_actionCentroid;
 
      //****QMenu****
-     QMenu* m_menuFile;
+     QMenu *m_menuFile;
 
      //Buttons
      QPushButton *m_LoadButton;
@@ -71,8 +72,8 @@ private:
      QCheckBox   *m_showCent;
 
 
-     vector<Tile>	 m_tiles;	  // array of mosaic tiles
-     GLWidget	    *m_glwidget; // widget in which to draw
+     vector<Tile>    m_tiles;     // array of mosaic tiles
+     GLWidget       *m_glwidget; // widget in which to draw
 
 
 

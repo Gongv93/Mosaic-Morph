@@ -1,5 +1,4 @@
 
-
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
@@ -15,17 +14,17 @@ class GLWidget : public QGLWidget
     Q_OBJECT
 
 public:
-     GLWidget(QWidget *parent = 0);
+     GLWidget();
     ~GLWidget();
 
-    void  setTiles(vector<Tile> &);
-    void  setTimer();
-    void  drawTiles();
-    bool  mFlagCentroid;
-    bool  mFlagRotate;
-    bool  mFlagScale;
 
-signals:
+    void  setTiles(vector<Tile> &);
+    void  drawTiles();
+    void  setTimer();
+    bool  m_FlagCentroid;
+    bool  m_FlagRotate;
+    bool  m_FlagScale;
+
 
 public slots:
     void s_Play();
@@ -36,11 +35,15 @@ protected:
     void resizeGL(int width, int height);
 
 private:
-    vector<Tile>	mTiles;
+    vector<Tile>    m_tiles;
+    bool            m_play;
+    QTimer*         m_Timer;
+    float           m_angle;
+    float           m_scale;
 
-    bool            mPlay;
 
-    QTimer          *mTimer;
+
+
 };
 
-#endif	// GLWIDGET_H
+#endif  // GLWIDGET_H

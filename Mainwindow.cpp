@@ -62,9 +62,6 @@ void MainWindow::createMenuFile()
 
 void MainWindow::leftLayout()
 {
-    // Create widget; set it to be app's central widget
-    m_glwidget = new GLWidget;  // widget for OpenGL drawing
-
     //Making Horizontal Slider
     QSlider *slider = new QSlider(Qt::Horizontal);
     slider ->setMinimum(1);
@@ -81,26 +78,10 @@ void MainWindow::leftLayout()
     m_LoadButton = new QPushButton("Load");
     m_playPause  = new QPushButton("Play/Pause");
 
-    //Load Button Signal-Slot Connection
-    connect(m_LoadButton, SIGNAL(clicked()), this, SLOT(s_loadTiles()));
-
-    // Play button signal-slot connection
-    connect(m_playPause, SIGNAL(clicked()), m_glwidget, SLOT(s_Play()));
-
     //Creating Checked Boxes
     m_scaleTiles  = new QCheckBox("Scale Tiles");
     m_rotateTiles = new QCheckBox("Rotate Tiles");
     m_showCent    = new QCheckBox("Show Centroid");
-
-    // Check box signal-slot connection
-    connect(m_showCent,SIGNAL(stateChanged(int)), this, SLOT(s_SetCentroid()));
-    connect(m_rotateTiles,SIGNAL(stateChanged(int)), this, SLOT(s_SetRotate()));
-    connect(m_scaleTiles,SIGNAL(stateChanged(int)), this, SLOT(s_SetScale()));
-
-    // Set inital checkbox as unchecked
-    m_showCent->setChecked(false);
-    m_rotateTiles->setChecked(true);
-    m_scaleTiles->setChecked(true);
 
     //Placing the Components:
     //1. Adding the Pushbuttons to a HBox
@@ -127,6 +108,9 @@ void MainWindow::leftLayout()
     leftVLayout -> addLayout(HorzSlider);
     leftVLayout ->addStretch();
 
+    // Create widget: set it to be app's central widget
+    m_glwidget = new GLWidget;  // widget for OpenGL drawing
+
     //4.Adding all widgets and OpenGl Drawing to a Horz Lay
     QHBoxLayout *HorzLayout = new QHBoxLayout;
     HorzLayout -> addLayout(leftVLayout);
@@ -138,20 +122,35 @@ void MainWindow::leftLayout()
     QWidget *window = new QWidget;
     window ->setLayout(HorzLayout);
     setCentralWidget(window);
+
+
+    //Signal Slot Connections
+    connect(m_LoadButton,SIGNAL(clicked()),this, SLOT(s_loadTiles()));
+    connect(m_showCent,SIGNAL(clicked()), this, SLOT(s_SetCentroid()));
+
+    connect(slider,  SIGNAL(valueChanged(int)), spinBox, SLOT(setValue(int)));
+    connect(spinBox, SIGNAL(valueChanged(int)), slider,  SLOT(setValue(int)));
+
+
 }
+
 
 //Slot Functions
-void MainWindow::s_SetCentroid()
-{
-    m_glwidget->mFlagCentroid = m_showCent->isChecked();
-}
-void MainWindow::s_SetRotate()
-{
 
-}
-void MainWindow::s_SetScale()
+//Slot Function for Showing Centroid
+void MainWindow::s_SetCentroid ()
 {
+    m_glwidget->m_FlagCentroid = m_showCent->isChecked();
+   // m_glwidget->setTiles(m_tiles);
+}
 
+
+void    MainWindow::s_SetRotate ()
+{
+}
+
+void    MainWindow::s_SetScale ()
+{
 }
 
 
@@ -170,33 +169,33 @@ void  MainWindow::s_loadTiles ()
         // QString tiles_base = info->baseName();
 
         // open file for reading a stream of text
-        QFile	file(fileName);
+        QFile   file(fileName);
         file.open(QIODevice::ReadOnly | QIODevice::Text);
         QTextStream in(&file);
 
         // read first three lines to get mosaic width, height, and number of tiles;
         // start with first line: mosaic width
-        QString line = in.readLine();		// read mosaic width (inches)
-        int   w  = line.toInt();		// convert string to int
-        float w2 = w >> 1;			// half-width for computing center
+        QString line = in.readLine();       // read mosaic width (inches)
+        int   w  = line.toInt();        // convert string to int
+        float w2 = w >> 1;          // half-width for computing center
 
         // read second line: mosaic height
-        line = in.readLine();			// read mosaic height (inches)
-        int h  = line.toInt();			// convert string to int
-        int h2 = h >> 1;			// half-height for computing center
+        line = in.readLine();           // read mosaic height (inches)
+        int h  = line.toInt();          // convert string to int
+        int h2 = h >> 1;            // half-height for computing center
 
         // read third line: number of tiles
-        line = in.readLine();			// read number of tiles
-        int n_tiles = line.toInt();		// convert string to int
+        line = in.readLine();           // read number of tiles
+        int n_tiles = line.toInt();     // convert string to int
         for (int i = 0; i<n_tiles; ++i) {
             Tile tile;
-            line = in.readLine();		// read number of vertices
-            int n_vertices = line.toInt();	// convert string to int
-            tile.setNum(n_vertices);	// set it in tile class
+            line = in.readLine();       // read number of vertices
+            int n_vertices = line.toInt();  // convert string to int
+            tile.setNum(n_vertices);    // set it in tile class
 
             // visit all vertices
             for (int j = 0; j<n_vertices; ++j) {
-                line = in.readLine();	// read coordinates
+                line = in.readLine();   // read coordinates
                 double x = line.section(',', 0, 0).toDouble();
                 double y = line.section(',', 1, 1).toDouble();
 
@@ -224,10 +223,8 @@ void  MainWindow::s_loadTiles ()
 
         // assign m_tiles to the OpenGL widget
         m_glwidget->setTiles(m_tiles);
-        //m_glwidget->setTimer();
 
 }
-
 
 
 void MainWindow::s_save       () {}
