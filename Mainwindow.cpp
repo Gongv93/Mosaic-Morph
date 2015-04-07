@@ -126,7 +126,10 @@ void MainWindow::leftLayout()
 
     //Signal Slot Connections
     connect(m_LoadButton,SIGNAL(clicked()),this, SLOT(s_loadTiles()));
-    connect(m_showCent,SIGNAL(clicked()), this, SLOT(s_SetCentroid()));
+    connect(m_showCent,SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setCentroid(int)));
+    connect(m_scaleTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setScale(int)));
+    connect(m_rotateTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setRotate(int)));  
+
 
     connect(slider,  SIGNAL(valueChanged(int)), spinBox, SLOT(setValue(int)));
     connect(spinBox, SIGNAL(valueChanged(int)), slider,  SLOT(setValue(int)));
@@ -134,24 +137,6 @@ void MainWindow::leftLayout()
 
 }
 
-
-//Slot Functions
-
-//Slot Function for Showing Centroid
-void MainWindow::s_SetCentroid ()
-{
-    m_glwidget->m_FlagCentroid = m_showCent->isChecked();
-   // m_glwidget->setTiles(m_tiles);
-}
-
-
-void    MainWindow::s_SetRotate ()
-{
-}
-
-void    MainWindow::s_SetScale ()
-{
-}
 
 
 void  MainWindow::s_loadTiles ()

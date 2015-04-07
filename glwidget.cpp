@@ -4,7 +4,6 @@
 GLWidget::GLWidget()
 {
     m_tiles.clear();
-    m_FlagCentroid = false;
     setTimer();
 
 }
@@ -73,7 +72,7 @@ void GLWidget::drawTiles()
     for (int i = 0; i<n_tiles; ++i) {
 
         // draw centroid
-        if(m_FlagCentroid)
+        if(m_flagCentroid)
         {
             glColor3f(1.0f, 1.0f, 1.0f);                    // Set color for point
             glPointSize(4.0f);                              // Set point size
@@ -94,13 +93,14 @@ void GLWidget::drawTiles()
         //rotate
         //then translate back.
 
-
-  //      glPushMatrix(); //saves the state of the transmission
-  //      glTranslatef(centroid.x(), centroid.y(), 0);
-  //      glScalef (m_scale, m_scale, m_scale);
-  //      glRotate(m_angle,0,0,1);
-  //      glTranslatef(-centroid.x(), -centroid.y(),0);
-
+        if(m_flagRotate) {
+            glPushMatrix();
+            glTranslatef(centroid.x(), centroid.y(), 0);
+            glScalef (m_scale, m_scale, m_scale);
+            glRotate(m_angle,0,0,1);
+            glTranslatef(-centroid.x(), -centroid.y(),0);
+            
+        }
 
         // draw tile polygon
         glBegin(GL_POLYGON);                         // set polygon mode
@@ -122,11 +122,24 @@ void GLWidget::s_Play()
     m_play =!m_play;
     if (m_play)
     {
-        m_Timer -> start();
+        m_Timer->start();
     }
 
-    else m_Timer ->stop();
+    else m_Timer->stop();
 
 }
 
+void GLWidget::s_setCentroid(int flag)
+{
+    m_flagCentroid = flag;
+}
 
+void GLWidget::s_setScale(int flag)
+{
+    m_flagScale = flag;
+}
+
+void GLWidget::s_setRotate(int flag)
+{
+    m_flagRotate = flag;
+}

@@ -38,10 +38,6 @@ public slots:
      void    s_saveAs      ();
      void    s_quit        ();
 
-     void    s_SetCentroid ();
-     void    s_SetRotate   ();
-     void    s_SetScale    ();
-
 private:
      //****Create Menu****
      void createMenuFile ();

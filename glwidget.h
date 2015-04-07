@@ -17,17 +17,16 @@ public:
      GLWidget();
     ~GLWidget();
 
-
     void  setTiles(vector<Tile> &);
     void  drawTiles();
     void  setTimer();
-    bool  m_FlagCentroid;
-    bool  m_FlagRotate;
-    bool  m_FlagScale;
 
 
 public slots:
     void s_Play();
+    void s_setCentroid(int flag);
+    void s_setScale(int flag);
+    void s_setRotate(int flag);
 
 protected:
     void initializeGL();
@@ -36,12 +35,13 @@ protected:
 
 private:
     vector<Tile>    m_tiles;
-    bool            m_play;
     QTimer*         m_Timer;
     float           m_angle;
     float           m_scale;
-
-
+    bool            m_play;
+    bool            m_flagCentroid;
+    bool            m_flagRotate;
+    bool            m_flagScale;
 
 
 };
