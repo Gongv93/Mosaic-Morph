@@ -1,0 +1,12 @@
+# Compiled
+*.pdb
+*.exe
+*.ilk
+*.obj
+*.pdb
+*.sln
+*.suo
+*.pgm
+*.pro
+*.bat
+*.gitignore
