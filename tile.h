@@ -23,10 +23,11 @@ public:
     QVector2D   centroid();
 
 private:
-    int                m_num;        //number of vertices
-    vector<QVector2D>  m_vertices;  //coordinates
-    QVector2D          m_centroid; //tile centroid
-    QColor             m_color;   //tile color
+    int                m_num;       // number of vertices
+    float              m_angle;     // Rotation angle
+    vector<QVector2D>  m_vertices;  // coordinates
+    QVector2D          m_centroid;  // tile centroid
+    QColor             m_color;     // tile color
 };
 
 #endif  // TILE_H

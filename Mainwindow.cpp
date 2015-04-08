@@ -126,10 +126,11 @@ void MainWindow::leftLayout()
 
     //Signal Slot Connections
     connect(m_LoadButton,SIGNAL(clicked()),this, SLOT(s_loadTiles()));
+    connect(m_playPause, SIGNAL(clicked()), m_glwidget, SLOT(s_Play()));
     connect(m_showCent,SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setCentroid(int)));
     connect(m_scaleTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setScale(int)));
     connect(m_rotateTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setRotate(int)));  
-
+    connect(slider, SIGNAL(valueChanged(int)), m_glwidget, SLOT(s_setAngleMultiplier(int)));    
 
     connect(slider,  SIGNAL(valueChanged(int)), spinBox, SLOT(setValue(int)));
     connect(spinBox, SIGNAL(valueChanged(int)), slider,  SLOT(setValue(int)));

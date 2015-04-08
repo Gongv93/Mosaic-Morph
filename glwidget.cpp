@@ -1,11 +1,22 @@
 
-#include "GLWidget.h"
+#include "glwidget.h"
 
 GLWidget::GLWidget()
 {
     m_tiles.clear();
     setTimer();
+    m_angle           = 0.0;     // Init angle
+    m_baseAngleSpeed  = 0.001f;  // Set base angle rotation speed
+    m_angleMulti      = 1.0f;    // Set angle multiplier
 
+    m_scale           = 1.0;
+    m_baseScaleFreq   = 0.003f;  // Set base scale speed
+    m_scaleAngle      = 0.0f;
+    
+    m_play            = true;
+    m_flagCentroid    = false;
+    m_flagRotate      = false;
+    m_flagScale       = false;
 }
 
 GLWidget::~GLWidget()
@@ -70,6 +81,7 @@ void GLWidget::drawTiles()
     // for each tile, get color and draw polygon
     int n_tiles = m_tiles.size();
     for (int i = 0; i<n_tiles; ++i) {
+        QVector2D centroid = m_tiles[i].centroid();
 
         // draw centroid
         if(m_flagCentroid)
@@ -77,7 +89,6 @@ void GLWidget::drawTiles()
             glColor3f(1.0f, 1.0f, 1.0f);                    // Set color for point
             glPointSize(4.0f);                              // Set point size
             glBegin(GL_POINTS);                             // set point mode
-            QVector2D centroid = m_tiles[i].centroid();     // Get centroid
             glVertex3f(centroid.x(), centroid.y(), 0.0f);   // assign (x,y) coords
             glEnd();
         }
@@ -86,23 +97,27 @@ void GLWidget::drawTiles()
         QColor color = m_tiles[i].color();
         glColor3f(color.redF(), color.greenF(), color.blueF());
 
-
-        //Rotating part need to fix
-        //translate to orgin
-        //scale
-        //rotate
-        //then translate back.
-
+        // Update tile transfomation params
         if(m_flagRotate) {
-            glPushMatrix();
-            glTranslatef(centroid.x(), centroid.y(), 0);
-            glScalef (m_scale, m_scale, m_scale);
-            glRotate(m_angle,0,0,1);
-            glTranslatef(-centroid.x(), -centroid.y(),0);
-            
+            m_angle += m_baseAngleSpeed * m_angleMulti;
+            if(m_angle >= 360.0)  m_angle = 0.0f;
         }
 
-        // draw tile polygon
+        // Scaling is done by a sine curve 
+        if(m_flagScale) {
+            m_scale = 1.0 + (0.9 * qSin(m_scaleAngle * m_baseScaleFreq * m_angleMulti));
+            m_scaleAngle += 0.01f;
+            if(m_angle == 3.14) m_scaleAngle = 0.0;
+        }
+
+        // Apply transformation
+        glPushMatrix();
+
+        glTranslatef(centroid.x(), centroid.y(), 0); 
+        glRotatef(m_angle, 0.0, 0.0, 1.0);     
+        glScalef(m_scale, m_scale,m_scale);          
+        glTranslatef(-centroid.x(), -centroid.y(), 0);
+
         glBegin(GL_POLYGON);                         // set polygon mode
         int n_vtx = m_tiles[i].num();                // get number of tile vertices
         for(int j = 0; j<n_vtx; ++j) {               // visit each tile vertex
@@ -110,6 +125,8 @@ void GLWidget::drawTiles()
             glVertex3f(vtx.x(), vtx.y(), 0.0f);      // assign vtx as next polygon vertex
         }
         glEnd();                                     // end polygon mode
+
+
         glPopMatrix();
     }
 
@@ -120,13 +137,17 @@ void GLWidget::drawTiles()
 void GLWidget::s_Play()
 {
     m_play =!m_play;
-    if (m_play)
-    {
-        m_Timer->start();
-    }
+    if (m_play) m_Timer->start();
+    else        m_Timer->stop();
 
-    else m_Timer->stop();
+}
 
+void GLWidget::s_setAngleMultiplier(int spinnerVal) 
+{
+    if(spinnerVal > 5)      m_angleMulti = (spinnerVal - 5) * 2;
+    else if(spinnerVal < 5) m_angleMulti = qPow(.5, 5 - spinnerVal);
+    else                    m_angleMulti = 1.0f;
+    
 }
 
 void GLWidget::s_setCentroid(int flag)
