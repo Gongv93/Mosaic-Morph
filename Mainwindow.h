@@ -1,5 +1,4 @@
 
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -39,10 +38,12 @@ public slots:
      void    s_quit        ();
 
 
-     void    s_resetCheckedBox    ();
+     void    s_resetWidget        ();
      void    s_resetRotateChecked ();
      void    s_resetScaleChecked  ();
      void    s_resetCentroid      ();
+     void    s_resetSlider        ();
+     void    s_resetSpinBox       ();
 
 
 private:

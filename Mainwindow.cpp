@@ -1,6 +1,5 @@
 
 
-
 /********** Senior Design Csc 59866 Section:
  ********** Asad Kamal     Email:
  ********** Vincent Gong   Email:
@@ -143,8 +142,8 @@ void MainWindow::createLeftSideLayout()
 
     //Reset Signal-Slot Connection
     connect(m_reset, SIGNAL(clicked()),m_glwidget, SLOT(s_reset()));
+    connect(m_reset, SIGNAL(clicked()),this, SLOT(s_resetWidget()));
 
-    connect(m_reset, SIGNAL(clicked()),this, SLOT(s_resetCheckedBox()));
 }
 
 //Slot Functions:
@@ -232,14 +231,16 @@ void MainWindow::s_quit()
    exit(0);
 }
 
+
 //Reset Slot Functions
-void MainWindow::s_resetCheckedBox()
+void MainWindow::s_resetWidget()
 {
     s_resetRotateChecked();
     s_resetScaleChecked();
     s_resetCentroid();
+    s_resetSlider();
+    s_resetSpinBox();
 }
-
 
 void MainWindow::s_resetRotateChecked()
 {
@@ -251,11 +252,18 @@ void MainWindow::s_resetScaleChecked()
     m_scaleTiles->setChecked(false);
 }
 
-
 void  MainWindow::s_resetCentroid  ()
 {
     m_showCent->setChecked(false);
 }
 
+void MainWindow::s_resetSlider()
+{
+    m_slider-> setValue(5);
+}
 
+void MainWindow::s_resetSpinBox()
+{
+    m_spinBox ->setValue(5);
+}
 
