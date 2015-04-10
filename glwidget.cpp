@@ -1,4 +1,5 @@
 
+
 #include "glwidget.h"
 
 GLWidget::GLWidget()
@@ -12,7 +13,7 @@ GLWidget::GLWidget()
     m_scale           = 1.0;
     m_baseScaleFreq   = 0.003f;  // Set base scale speed
     m_scaleAngle      = 0.0f;
-    
+
     m_play            = true;
     m_flagCentroid    = false;
     m_flagRotate      = false;
@@ -103,7 +104,7 @@ void GLWidget::drawTiles()
             if(m_angle >= 360.0)  m_angle = 0.0f;
         }
 
-        // Scaling is done by a sine curve 
+        // Scaling is done by a sine curve
         if(m_flagScale) {
             m_scale = 1.0 + (0.9 * qSin(m_scaleAngle * m_baseScaleFreq * m_angleMulti));
             m_scaleAngle += 0.01f;
@@ -113,9 +114,9 @@ void GLWidget::drawTiles()
         // Apply transformation
         glPushMatrix();
 
-        glTranslatef(centroid.x(), centroid.y(), 0); 
-        glRotatef(m_angle, 0.0, 0.0, 1.0);     
-        glScalef(m_scale, m_scale,m_scale);          
+        glTranslatef(centroid.x(), centroid.y(), 0);
+        glRotatef(m_angle, 0.0, 0.0, 1.0);
+        glScalef(m_scale, m_scale,m_scale);
         glTranslatef(-centroid.x(), -centroid.y(), 0);
 
         glBegin(GL_POLYGON);                         // set polygon mode
@@ -142,12 +143,12 @@ void GLWidget::s_Play()
 
 }
 
-void GLWidget::s_setAngleMultiplier(int spinnerVal) 
+void GLWidget::s_setAngleMultiplier(int spinnerVal)
 {
     if(spinnerVal > 5)      m_angleMulti = (spinnerVal - 5) * 2;
     else if(spinnerVal < 5) m_angleMulti = qPow(.5, 5 - spinnerVal);
     else                    m_angleMulti = 1.0f;
-    
+
 }
 
 void GLWidget::s_setCentroid(int flag)
@@ -164,3 +165,25 @@ void GLWidget::s_setRotate(int flag)
 {
     m_flagRotate = flag;
 }
+
+
+//Reset Slot Functions
+void GLWidget::s_reset()
+{
+    s_resetRotate();
+    s_resetScale();
+}
+
+
+void GLWidget::s_resetRotate()
+{
+    m_angle=0.0;
+
+}
+
+
+void GLWidget::s_resetScale()
+{
+    m_scale=1.0;
+}
+

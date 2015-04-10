@@ -1,5 +1,6 @@
 
 
+
 /********** Senior Design Csc 59866 Section:
  ********** Asad Kamal     Email:
  ********** Vincent Gong   Email:
@@ -77,6 +78,7 @@ void MainWindow::createWidget()
     //Creating Push Buttons: Load & Play/Pause
     m_LoadButton = new QPushButton("Load");
     m_playPause  = new QPushButton("Play/Pause");
+    m_reset      = new QPushButton("Reset");
 
     //Creating Checked Boxes
     m_scaleTiles  = new QCheckBox("Scale Tiles");
@@ -93,6 +95,7 @@ void MainWindow::createLeftSideLayout()
     QHBoxLayout *HorzButtons = new QHBoxLayout;
     HorzButtons -> addWidget(m_LoadButton);
     HorzButtons -> addWidget(m_playPause);
+    HorzButtons -> addWidget(m_reset);
 
     //2. Adding Slider/SpinBox widget to a hBox
     QLabel *speed = new QLabel("Speed");
@@ -134,11 +137,17 @@ void MainWindow::createLeftSideLayout()
     connect(m_scaleTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setScale(int)));
     connect(m_rotateTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setRotate(int)));
 
-    connect(m_slider, SIGNAL(valueChanged(int)), m_glwidget, SLOT(s_setAngleMultiplier(int)));
+    connect(m_slider,  SIGNAL(valueChanged(int)), m_glwidget, SLOT(s_setAngleMultiplier(int)));
     connect(m_slider,  SIGNAL(valueChanged(int)), m_spinBox, SLOT(setValue(int)));
     connect(m_spinBox, SIGNAL(valueChanged(int)), m_slider,  SLOT(setValue(int)));
 
+    //Reset Signal-Slot Connection
+    connect(m_reset, SIGNAL(clicked()),m_glwidget, SLOT(s_reset()));
+
+    connect(m_reset, SIGNAL(clicked()),this, SLOT(s_resetCheckedBox()));
 }
+
+//Slot Functions:
 
 void  MainWindow::s_loadTiles ()
 {
@@ -222,5 +231,31 @@ void MainWindow::s_quit()
 {
    exit(0);
 }
+
+//Reset Slot Functions
+void MainWindow::s_resetCheckedBox()
+{
+    s_resetRotateChecked();
+    s_resetScaleChecked();
+    s_resetCentroid();
+}
+
+
+void MainWindow::s_resetRotateChecked()
+{
+    m_rotateTiles->setChecked(false);
+}
+
+void MainWindow::s_resetScaleChecked()
+{
+    m_scaleTiles->setChecked(false);
+}
+
+
+void  MainWindow::s_resetCentroid  ()
+{
+    m_showCent->setChecked(false);
+}
+
 
 

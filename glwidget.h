@@ -1,4 +1,6 @@
 
+
+
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
@@ -28,6 +30,11 @@ class GLWidget : public QGLWidget
         void s_setCentroid(int flag);
         void s_setScale(int flag);
         void s_setRotate(int flag);
+
+        void    s_reset       ();
+        void    s_resetRotate ();
+        void    s_resetScale  ();
+
 
     protected:
         void initializeGL();

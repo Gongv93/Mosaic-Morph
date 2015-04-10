@@ -1,4 +1,5 @@
 
+
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -37,6 +38,13 @@ public slots:
      void    s_saveAs      ();
      void    s_quit        ();
 
+
+     void    s_resetCheckedBox    ();
+     void    s_resetRotateChecked ();
+     void    s_resetScaleChecked  ();
+     void    s_resetCentroid      ();
+
+
 private:
      //***Create Menu***
      void createMenuFile ();
@@ -63,6 +71,7 @@ private:
      //Buttons
      QPushButton *m_LoadButton;
      QPushButton *m_playPause;
+     QPushButton *m_reset;
 
      //Check Boxes
      QCheckBox   *m_scaleTiles;
