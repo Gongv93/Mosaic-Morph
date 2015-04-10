@@ -1,5 +1,4 @@
 
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -39,14 +38,17 @@ public slots:
      void    s_quit        ();
 
 private:
-     //****Create Menu****
+     //***Create Menu***
      void createMenuFile ();
 
-     //****Create Actions****
+     //***Create Actions***
      void createActionsFile ();
 
+     //***Widgets created***
+     void createWidget();
+
      //***Layout for Left Side***
-     void leftLayout();
+     void createLeftSideLayout();
 
      //****QAction for File****
      QAction*     m_actionLoadTiles;
@@ -66,6 +68,12 @@ private:
      QCheckBox   *m_scaleTiles;
      QCheckBox   *m_rotateTiles;
      QCheckBox   *m_showCent;
+
+     //Sliders
+     QSlider     *m_slider;
+
+     //Spin Box
+     QSpinBox *m_spinBox;
 
 
      vector<Tile>    m_tiles;     // array of mosaic tiles

@@ -1,10 +1,10 @@
 
+
 /********** Senior Design Csc 59866 Section:
- ********** Asad Kamal     Email: Asad.k01@gmail.com
+ ********** Asad Kamal     Email:
  ********** Vincent Gong   Email:
  ********** RuLong Huang   Email:
 */
-
 
 
 #include "Mainwindow.h"
@@ -14,7 +14,8 @@ MainWindow::MainWindow()
 {
     createActionsFile();
     createMenuFile();
-    leftLayout();
+    createWidget();
+    createLeftSideLayout();
 }
 
 MainWindow::~MainWindow()
@@ -46,7 +47,6 @@ void MainWindow::createActionsFile()
     connect(m_actionQuit, SIGNAL(triggered()),this, SLOT(s_quit()));
 }
 
-
 //Associating the actions with File Menu
 void MainWindow::createMenuFile()
 {
@@ -57,22 +57,22 @@ void MainWindow::createMenuFile()
     m_menuFile->addAction(m_actionSaveAs);
     m_menuFile->addSeparator();
     m_menuFile->addAction(m_actionQuit);
-
 }
 
-void MainWindow::leftLayout()
+
+void MainWindow::createWidget()
 {
     //Making Horizontal Slider
-    QSlider *slider = new QSlider(Qt::Horizontal);
-    slider ->setMinimum(1);
-    slider->setMaximum(10);
-    slider->setValue(5);
+    m_slider = new QSlider(Qt::Horizontal);
+    m_slider ->setMinimum(1);
+    m_slider->setMaximum(10);
+    m_slider->setValue(5);
 
     //Making SpinBox
-    QSpinBox *spinBox = new QSpinBox;
-    spinBox ->setMinimum(1);
-    spinBox ->setMaximum(10);
-    spinBox ->setValue(5);
+    m_spinBox = new QSpinBox;
+    m_spinBox ->setMinimum(1);
+    m_spinBox ->setMaximum(10);
+    m_spinBox ->setValue(5);
 
     //Creating Push Buttons: Load & Play/Pause
     m_LoadButton = new QPushButton("Load");
@@ -82,22 +82,25 @@ void MainWindow::leftLayout()
     m_scaleTiles  = new QCheckBox("Scale Tiles");
     m_rotateTiles = new QCheckBox("Rotate Tiles");
     m_showCent    = new QCheckBox("Show Centroid");
+}
 
+
+void MainWindow::createLeftSideLayout()
+{
     //Placing the Components:
+
     //1. Adding the Pushbuttons to a HBox
     QHBoxLayout *HorzButtons = new QHBoxLayout;
     HorzButtons -> addWidget(m_LoadButton);
     HorzButtons -> addWidget(m_playPause);
 
-    //Placing the Components:
-    //2. Adding Slider/spinbox wiget to a hBox
+    //2. Adding Slider/SpinBox widget to a hBox
     QLabel *speed = new QLabel("Speed");
     QHBoxLayout *HorzSlider = new QHBoxLayout;
     HorzSlider -> addWidget(speed);
-    HorzSlider -> addWidget(slider);
-    HorzSlider -> addWidget(spinBox);
+    HorzSlider -> addWidget(m_slider);
+    HorzSlider -> addWidget(m_spinBox);
 
-    //Placing the Components:
     //3. Adding all of the widgets to a
     //main Vertical Layout on the left Side.
     QVBoxLayout *leftVLayout = new QVBoxLayout;
@@ -123,22 +126,19 @@ void MainWindow::leftLayout()
     window ->setLayout(HorzLayout);
     setCentralWidget(window);
 
-
     //Signal Slot Connections
     connect(m_LoadButton,SIGNAL(clicked()),this, SLOT(s_loadTiles()));
     connect(m_playPause, SIGNAL(clicked()), m_glwidget, SLOT(s_Play()));
+
     connect(m_showCent,SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setCentroid(int)));
     connect(m_scaleTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setScale(int)));
-    connect(m_rotateTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setRotate(int)));  
-    connect(slider, SIGNAL(valueChanged(int)), m_glwidget, SLOT(s_setAngleMultiplier(int)));    
+    connect(m_rotateTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setRotate(int)));
 
-    connect(slider,  SIGNAL(valueChanged(int)), spinBox, SLOT(setValue(int)));
-    connect(spinBox, SIGNAL(valueChanged(int)), slider,  SLOT(setValue(int)));
-
+    connect(m_slider, SIGNAL(valueChanged(int)), m_glwidget, SLOT(s_setAngleMultiplier(int)));
+    connect(m_slider,  SIGNAL(valueChanged(int)), m_spinBox, SLOT(setValue(int)));
+    connect(m_spinBox, SIGNAL(valueChanged(int)), m_slider,  SLOT(setValue(int)));
 
 }
-
-
 
 void  MainWindow::s_loadTiles ()
 {
