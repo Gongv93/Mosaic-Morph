@@ -9,7 +9,7 @@
 #include "Tile.h"
 
 Tile::Tile()
-    : m_num(0)
+    : m_num(0) , m_depth(0.0f), m_angleX(0.0f), m_angleY(0.0f), m_angleZ(0.0f)
 {}
 
 
@@ -19,32 +19,6 @@ void Tile::setNum(int num)
     m_num = num;
 }
 
-
-void Tile::setRandColor()
-{
-    m_color.setRgb((rand() % 256), (rand() % 256), (rand() % 256));
-}
-
-void Tile::setCentroid()
-{
-    int i;
-    float x = 0.0, y = 0.0;
-
-    // Summing up the x and y coords
-    for(i = 0; i < m_num; i++) {
-        x += m_vertices[i].x();
-        y += m_vertices[i].y();
-    }
-
-    // Setting the centroids
-    m_centroid.setX(x/m_num);
-    m_centroid.setY(y/m_num);
-}
-
-
-QVector2D Tile::centroid(){
-    return m_centroid;
-}
 
 
 int Tile::num()
@@ -68,8 +42,79 @@ QVector2D Tile::vertex(int k)
 
 
 
+void Tile::setRandColor()
+{
+    m_color.setRgb((rand() % 256), (rand() % 256), (rand() % 256));
+}
+
+
+
 QColor Tile::color()
 {
     return m_color;
 }
 
+void Tile::setCentroid()
+{
+    float cx = 0.;
+    float cy = 0.;
+    for (int i = 0; i<m_num; ++i) {
+        QVector2D vtx = m_vertices[i];
+        cx += vtx.x();
+        cy += vtx.y();
+    }
+    m_centroid.setX(cx / m_num);
+    m_centroid.setY(cy / m_num);
+}
+
+
+QVector2D Tile::centroid()
+{
+    return m_centroid;
+}
+
+float   Tile::depth()
+{
+    return m_depth;
+}
+
+
+void    Tile::setDepth(float depth)
+{
+    m_depth = depth;
+}
+
+void    Tile::updateDepth(float depth)
+{
+    m_depth += depth;
+}
+
+
+float   Tile::angleX()
+{
+    return m_angleX;
+}
+
+float   Tile::angleY()
+{
+    return m_angleY;
+}
+
+float   Tile::angleZ()
+{
+    return m_angleZ;
+}
+
+void    Tile::setAngles(float x, float y, float z)
+{
+    m_angleX = x;
+    m_angleY = y;
+    m_angleZ = z;
+}
+
+void    Tile::updateAngles(float x, float y, float z)
+{
+    m_angleX += x;
+    m_angleY += y;
+    m_angleZ += z;
+}
