@@ -23,6 +23,7 @@ public:
     float       angleZ();
     void        setDepth(float);
     void        updateDepth(float);
+    void        setAngles(float, float, float);
     void        updateAngles(float, float, float);
     QColor      color();
     QVector2D   vertex(int);

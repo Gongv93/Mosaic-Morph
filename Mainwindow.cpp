@@ -64,13 +64,13 @@ void MainWindow::createWidget()
     m_slider = new QSlider(Qt::Horizontal);
     m_slider ->setMinimum(1);
     m_slider->setMaximum(10);
-    m_slider->setValue(5);
+    m_slider->setValue(1);
 
     //Making SpinBox
     m_spinBox = new QSpinBox;
     m_spinBox ->setMinimum(1);
     m_spinBox ->setMaximum(10);
-    m_spinBox ->setValue(5);
+    m_spinBox ->setValue(1);
 
     //Creating Push Buttons: Load & Play/Pause
     m_LoadButton = new QPushButton("Load");
@@ -134,7 +134,7 @@ void MainWindow::createLeftSideLayout()
     connect(m_scaleTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setScale(int)));
     connect(m_rotateTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setRotate(int)));
 
-    connect(m_slider,  SIGNAL(valueChanged(int)), m_glwidget, SLOT(s_setAngleMultiplier(int)));
+    connect(m_slider,  SIGNAL(valueChanged(int)), m_glwidget, SLOT(s_setSpeedMultiplier(int)));
     connect(m_slider,  SIGNAL(valueChanged(int)), m_spinBox, SLOT(setValue(int)));
     connect(m_spinBox, SIGNAL(valueChanged(int)), m_slider,  SLOT(setValue(int)));
 
@@ -200,11 +200,11 @@ void  MainWindow::s_resetCentroid  ()
 
 void MainWindow::s_resetSlider()
 {
-    m_slider-> setValue(5);
+    m_slider-> setValue(1);
 }
 
 void MainWindow::s_resetSpinBox()
 {
-    m_spinBox ->setValue(5);
+    m_spinBox ->setValue(1);
 }
 

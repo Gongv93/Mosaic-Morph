@@ -5,15 +5,12 @@
 GLWidget::GLWidget()
 {
     m_tiles.clear();
-    m_angle           = 0.0;     // Init angle
-    m_baseAngleSpeed  = 0.001f;  // Set base angle rotation speed
-    m_angleMulti      = 1.0f;    // Set angle multiplier
+    m_speedMulti      = 1.0f;    // Set angle multiplier
+    m_r2              = 0.0f;
 
     m_scale           = 1.0;
-    m_baseScaleFreq   = 0.003f;  // Set base scale speed
-    m_scaleAngle      = 0.0f;
 
-    m_play            = true;
+    m_play            = false;
     m_flagCentroid    = false;
     m_flagRotate      = false;
     m_flagScale       = false;
@@ -74,9 +71,27 @@ void GLWidget::paintGL()
 
     // move camera and look at origin
     glTranslatef(0, 0, 3.0);
-    gluLookAt(0.0, 0.0, 5.0, 0, 0, 0, 0.0, 1.0, 0.0);
+    gluLookAt(0.0, -3.0, 5.0, 0, 0, 0, 0.0, 1.0, 0.0);
 
     drawTiles();
+
+    if(m_play) {
+        // First scale down to .75
+        if(m_scale > .75) {
+            m_scale = m_scale - (0.01 * m_speedMulti) ;
+        }
+
+        // Then explode
+        if(m_scale <= .75) {
+            m_r2 += .003 * m_speedMulti;
+            // Update each tile for the next render cycle
+            int n_tiles = m_tiles.size();
+            for(int i = 0; i < n_tiles; ++i) {
+                radialMotion(m_tiles[i]);
+            }
+        }
+    }
+
 
 }
 
@@ -136,6 +151,7 @@ void GLWidget::drawTiles()
         QColor color = m_tiles[i].color();
         glColor3f(color.redF(), color.greenF(), color.blueF());
 
+        /*
         // Update tile transfomation params
         if(m_flagRotate) {
             m_angle += m_baseAngleSpeed * m_angleMulti;
@@ -148,16 +164,17 @@ void GLWidget::drawTiles()
             m_scaleAngle += 0.01f;
             if(m_angle == 3.14) m_scaleAngle = 0.0;
         }
+        */
 
         // Apply transformation
         glPushMatrix();
 
-        glTranslatef(centroid.x(), centroid.y(), 0);
+        glTranslatef(centroid.x(), centroid.y(), m_tiles[i].depth());
         glScalef(m_scale, m_scale,m_scale);
-        glRotatef(m_angle, 1.0, 0.0, 0.0);
-        glRotatef(m_angle, 0.0, 1.0, 0.0);
-        glRotatef(m_angle, 0.0, 0.0, 1.0);
-        glTranslatef(-centroid.x(), -centroid.y(), 0);
+        glRotatef(m_tiles[i].angleX(), 1.0, 0.0, 0.0);
+        glRotatef(m_tiles[i].angleY(), 0.0, 1.0, 0.0);
+        glRotatef(m_tiles[i].angleZ(), 0.0, 0.0, 1.0);
+        glTranslatef(-centroid.x(), -centroid.y(), -m_tiles[i].depth());
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE, m_texture);
@@ -167,7 +184,7 @@ void GLWidget::drawTiles()
         for(int j = 0; j<n_vtx; ++j) {               // visit each tile vertex
             QVector2D vtx = m_tiles[i].vertex(j);    // assign (x,y) coords to vtx
             glTexCoord2f(vtx.x() + 0.5, vtx.y() + 0.5);
-            glVertex3f(vtx.x(), vtx.y(), 0.0f);      // assign vtx as next polygon vertex
+            glVertex3f(vtx.x(), vtx.y(), m_tiles[i].depth());      // assign vtx as next polygon vertex
         }
         glEnd();                                     // end polygon mode
 
@@ -210,6 +227,7 @@ void GLWidget::loadTiles(QString &fileName)
             line = in.readLine();		// read number of vertices
             int n_vertices = line.toInt();	// convert string to int
             tile.setNum(n_vertices);	// set it in tile class
+            tile.setDepth(0);
 
             // visit all vertices
             for (int j = 0; j<n_vertices; ++j)
@@ -234,6 +252,8 @@ void GLWidget::loadTiles(QString &fileName)
 
         // close file
         file.close();
+
+        m_play = true;
 }
 
 
@@ -295,12 +315,9 @@ void GLWidget::s_Play()
 
 }
 
-void GLWidget::s_setAngleMultiplier(int spinnerVal)
+void GLWidget::s_setSpeedMultiplier(int spinnerVal)
 {
-    if(spinnerVal > 5)      m_angleMulti = (spinnerVal - 5) * 2;
-    else if(spinnerVal < 5) m_angleMulti = qPow(.5, 5 - spinnerVal);
-    else                    m_angleMulti = 1.0f;
-
+    m_speedMulti = spinnerVal;
 }
 
 void GLWidget::s_setCentroid(int flag)
@@ -322,20 +339,12 @@ void GLWidget::s_setRotate(int flag)
 //Reset Slot Functions
 void GLWidget::s_reset()
 {
-    s_resetRotate();
-    s_resetScale();
-}
-
-
-void GLWidget::s_resetRotate()
-{
-    m_angle=0.0;
-
-}
-
-
-void GLWidget::s_resetScale()
-{
-    m_scale=1.0;
+    int n_tiles = m_tiles.size();
+    for(int i = 0; i < n_tiles; ++i) {
+        m_tiles[i].setDepth(0);
+        m_tiles[i].setAngles(0.0, 0.0, 0.0);
+    }
+    m_scale = 1.0;
+    m_r2 = 0.0;
 }
 

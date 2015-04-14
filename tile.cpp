@@ -104,6 +104,14 @@ float   Tile::angleZ()
 {
     return m_angleZ;
 }
+
+void    Tile::setAngles(float x, float y, float z) 
+{
+    m_angleX = x;
+    m_angleY = y;
+    m_angleZ = z;
+}
+
 void    Tile::updateAngles(float x, float y, float z)
 {
     m_angleX += x;
