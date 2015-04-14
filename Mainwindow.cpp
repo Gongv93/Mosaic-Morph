@@ -156,7 +156,7 @@ void  MainWindow::s_loadTiles ()
 
         // assign m_tiles to the OpenGL widget
         m_glwidget->loadTiles(fileName);
-       // m_glwidget->loadTexture();
+        m_glwidget->loadTexture();
         m_glwidget->setTimer();
 
 }

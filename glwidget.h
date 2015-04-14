@@ -7,6 +7,7 @@
 #include <QtGui>
 #include <QtOpenGL>
 #include <QtCore/qmath.h>
+#include <GL/glu.h>
 #include <vector>
 #include "Tile.h"
 
@@ -19,10 +20,13 @@ class GLWidget : public QGLWidget
          GLWidget();
         ~GLWidget();
 
-        void  setTiles(vector<Tile> &);
-        void  loadTiles	(QString &);
-        void  drawTiles();
-        void  setTimer();
+        void        setTiles(vector<Tile> &);
+        void        loadTiles	(QString &);
+        void        drawTiles();
+        void        setTimer();
+        void        radialMotion    (Tile &);
+        void        loadTexture();
+        QVector3D   computeNormal   (QVector2D &, QVector2D &, float, float);
 
     public slots:
         void s_Play();
@@ -49,6 +53,9 @@ class GLWidget : public QGLWidget
         bool            m_flagCentroid;
         bool            m_flagRotate;
         bool            m_flagScale;
+
+        float           m_r2;
+        GLuint          m_texture;
 
         float           m_angle;
         float           m_baseAngleSpeed;

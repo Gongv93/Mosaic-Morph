@@ -25,13 +25,34 @@ GLWidget::~GLWidget()
 
 void GLWidget::initializeGL()
 {
-    qglClearColor(QColor(0., 0., 0., 1.0));
+        // clear color and depth buffers
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // enable smooth points
-    glEnable(GL_POINT_SMOOTH);
+    // add ambient light
+    GLfloat ambientColor[] = {0.5f, 0.5f, 0.5f, 1.0f};
+    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
+    
+    // add positioned light
+    GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f};
+    GLfloat lightPos0  [] = {4.0f, 0.0f, 8.0f, 1.0f};
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
+    glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
+    
+    // add directed light
+    GLfloat lightColor1[] = {0.5f, 0.5f, 0.5f, 1.0f};
+    GLfloat lightPos1  [] = {-1.0f, 0.5f, 0.5f, 0.0f};
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, lightColor1);
+    glLightfv(GL_LIGHT1, GL_POSITION, lightPos1);
 
-    // enable depth test
-    glEnable(GL_DEPTH_TEST);
+    // update modelview matrix
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // move camera and look at origin
+    glTranslatef(0, 0, 3.0);
+    gluLookAt(0.0, 0.0, 2.0, 0, 0, 0, 0.0, 1.0, 0.0);
+    drawTiles();
+
 }
 
 
@@ -45,12 +66,13 @@ void GLWidget::paintGL()
 
 void GLWidget::resizeGL(int w, int h)
 {
+    int side = qMin(w, h);
+    glViewport((w - side) / 2, (h - side) / 2, side, side);
+
     // initialize viewing values; setup unit view cube
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-w/2.0, w/2.0, -h/2.0, h/2.0, -3, 3);
-    int side = qMin(w, h);
-    glViewport((w - side) / 2, (h - side) / 2, side, side);
+    gluPerspective(45, 1.0, .01, 1000.);
 
 }
 
@@ -113,19 +135,26 @@ void GLWidget::drawTiles()
         // Apply transformation
         glPushMatrix();
 
-        glTranslatef(centroid.x(), centroid.y(), 0);
-        glRotatef(m_angle, 0.0, 0.0, 1.0);
+        glTranslatef(centroid.x(), centroid.y(), m_tiles[i].depth());
         glScalef(m_scale, m_scale,m_scale);
-        glTranslatef(-centroid.x(), -centroid.y(), 0);
+        glRotatef(m_angle, 1.0, 0.0, 0.0);
+        glRotatef(m_angle, 0.0, 1.0, 0.0);
+        glRotatef(m_angle, 0.0, 0.0, 1.0);
+        glTranslatef(-centroid.x(), -centroid.y(), -m_tiles[i].depth());
+
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE, m_texture);
 
         glBegin(GL_POLYGON);                         // set polygon mode
         int n_vtx = m_tiles[i].num();                // get number of tile vertices
         for(int j = 0; j<n_vtx; ++j) {               // visit each tile vertex
             QVector2D vtx = m_tiles[i].vertex(j);    // assign (x,y) coords to vtx
+            glTexCoord2f(vtx.x() + 0.5, vtx.y() + 0.5);
             glVertex3f(vtx.x(), vtx.y(), 0.0f);      // assign vtx as next polygon vertex
         }
         glEnd();                                     // end polygon mode
 
+        glDisable(GL_TEXTURE_2D);
 
         glPopMatrix();
     }
@@ -189,6 +218,55 @@ void GLWidget::loadTiles(QString &fileName)
         // close file
         file.close();
 }
+
+
+QVector3D GLWidget::computeNormal(QVector2D &vtx1, QVector2D &vtx2, float depth, float thickness)
+{
+    QVector3D p1(vtx1.x(), vtx1.y(), depth);
+    QVector3D p2(vtx2.x(), vtx2.y(), depth);
+    QVector3D p3(vtx1.x(), vtx1.y(), depth+thickness);
+    QVector3D v1 = p2 - p1;
+    QVector3D v2 = p3 - p1;
+    QVector3D v3 = QVector3D::crossProduct(v1, v2);
+    return v3.normalized();
+}
+
+
+void GLWidget::radialMotion(Tile &tile)
+{
+    QVector2D cen = tile.centroid();
+    float dist2 = (cen.x()*cen.x() + cen.y()*cen.y());
+    if(dist2 <= m_r2) {
+        tile.updateDepth((rand() % 10000) / 500000.0);
+        tile.updateAngles((rand() % 10) / 3.0, (rand() % 10) / 3.0, (rand() % 10) / 10.0);
+    }
+}
+
+void    GLWidget::loadTexture()
+{
+    QImage img(m_imgFileName);
+
+    QImage GL_formatted_image;
+    GL_formatted_image = QGLWidget::convertToGLFormat(img);
+
+    glGenTextures(1, &m_texture);
+
+    //bind the texture ID
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+    
+    //texture parameters
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //generate the texture
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, GL_formatted_image.width(),
+              GL_formatted_image.height(),
+              0, GL_RGBA, GL_UNSIGNED_BYTE, GL_formatted_image.bits() );
+    glTexEnvf      (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+
+}
+
 
 
 //Slot Functions:
