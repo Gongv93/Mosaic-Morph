@@ -1,11 +1,9 @@
 
-
 /********** Senior Design Csc 59866 Section:
  ********** Asad Kamal     Email:
  ********** Vincent Gong   Email:
  ********** RuLong Huang   Email:
 */
-
 
 #include "Mainwindow.h"
 
@@ -156,67 +154,10 @@ void  MainWindow::s_loadTiles ()
         // error checking
         if (fileName == NULL) return;
 
-        // get file path, name, and basename
-        // QFileInfo *info = new QFileInfo(fileName);
-        // QString tiles_path = info->path();
-        // QString tiles_name = info->fileName();
-        // QString tiles_base = info->baseName();
-
-        // open file for reading a stream of text
-        QFile   file(fileName);
-        file.open(QIODevice::ReadOnly | QIODevice::Text);
-        QTextStream in(&file);
-
-        // read first three lines to get mosaic width, height, and number of tiles;
-        // start with first line: mosaic width
-        QString line = in.readLine();       // read mosaic width (inches)
-        int   w  = line.toInt();        // convert string to int
-        float w2 = w >> 1;          // half-width for computing center
-
-        // read second line: mosaic height
-        line = in.readLine();           // read mosaic height (inches)
-        int h  = line.toInt();          // convert string to int
-        int h2 = h >> 1;            // half-height for computing center
-
-        // read third line: number of tiles
-        line = in.readLine();           // read number of tiles
-        int n_tiles = line.toInt();     // convert string to int
-        for (int i = 0; i<n_tiles; ++i) {
-            Tile tile;
-            line = in.readLine();       // read number of vertices
-            int n_vertices = line.toInt();  // convert string to int
-            tile.setNum(n_vertices);    // set it in tile class
-
-            // visit all vertices
-            for (int j = 0; j<n_vertices; ++j) {
-                line = in.readLine();   // read coordinates
-                double x = line.section(',', 0, 0).toDouble();
-                double y = line.section(',', 1, 1).toDouble();
-
-                // constructor function assigns normalized coordinate [-1,1] to vtx;
-                // note: w2 and h2 are floats so that result is float too
-                QVector2D vtx((x-w2)/w2, (y-h2)/h2);
-
-                // add vertex to list of vertices in tile object
-                tile.addVertex(vtx);
-            }
-
-            // set the controid
-            tile.setCentroid();
-
-            // set a random color for tile
-            tile.setRandColor();
-
-            // add tile to the m_tiles array
-            m_tiles.push_back(tile);
-
-        }
-
-        // close file
-        file.close();
-
         // assign m_tiles to the OpenGL widget
-        m_glwidget->setTiles(m_tiles);
+        m_glwidget->loadTiles(fileName);
+       // m_glwidget->loadTexture();
+        m_glwidget->setTimer();
 
 }
 

@@ -1,6 +1,5 @@
 
 
-
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
 
@@ -21,6 +20,7 @@ class GLWidget : public QGLWidget
         ~GLWidget();
 
         void  setTiles(vector<Tile> &);
+        void  loadTiles	(QString &);
         void  drawTiles();
         void  setTimer();
 
@@ -42,6 +42,7 @@ class GLWidget : public QGLWidget
         void resizeGL(int width, int height);
 
     private:
+        QString		    m_imgFileName;
         vector<Tile>    m_tiles;
         QTimer*         m_Timer;
         bool            m_play;
