@@ -25,6 +25,30 @@ GLWidget::~GLWidget()
 
 void GLWidget::initializeGL()
 {
+    qglClearColor(QColor(0., 0., 0., 1.0));
+
+    // enable smooth points
+    glEnable(GL_POINT_SMOOTH);
+
+    // enable depth test
+    //glEnable(GL_DEPTH_TEST);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);               // Set background color to black and opaque
+    glClearDepth(1.0f);                                 // Set background depth to farthest
+    glEnable(GL_DEPTH_TEST);                            // Enable depth testing for z-culling
+    glDepthFunc(GL_LEQUAL);                             // Set the type of depth-test
+    glShadeModel(GL_SMOOTH);                            // Enable smooth shading
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);  // Nice perspective corrections
+    glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_LIGHTING);                              //Enable lighting
+    glEnable(GL_LIGHT0);                                //Enable light #0
+    glEnable(GL_LIGHT1);                                //Enable light #1
+    glEnable(GL_NORMALIZE);                             //Automatically normalize normals
+
+}
+
+
+void GLWidget::paintGL()
+{
         // clear color and depth buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -50,17 +74,10 @@ void GLWidget::initializeGL()
 
     // move camera and look at origin
     glTranslatef(0, 0, 3.0);
-    gluLookAt(0.0, 0.0, 2.0, 0, 0, 0, 0.0, 1.0, 0.0);
+    gluLookAt(0.0, 0.0, 5.0, 0, 0, 0, 0.0, 1.0, 0.0);
+
     drawTiles();
 
-}
-
-
-void GLWidget::paintGL()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
-    drawTiles();
 }
 
 
@@ -135,12 +152,12 @@ void GLWidget::drawTiles()
         // Apply transformation
         glPushMatrix();
 
-        glTranslatef(centroid.x(), centroid.y(), m_tiles[i].depth());
+        glTranslatef(centroid.x(), centroid.y(), 0);
         glScalef(m_scale, m_scale,m_scale);
         glRotatef(m_angle, 1.0, 0.0, 0.0);
         glRotatef(m_angle, 0.0, 1.0, 0.0);
         glRotatef(m_angle, 0.0, 0.0, 1.0);
-        glTranslatef(-centroid.x(), -centroid.y(), -m_tiles[i].depth());
+        glTranslatef(-centroid.x(), -centroid.y(), 0);
 
         glEnable(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE, m_texture);
