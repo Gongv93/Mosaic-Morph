@@ -149,16 +149,25 @@ void MainWindow::createLeftSideLayout()
 void  MainWindow::s_loadTiles ()
 {
     // launch file dialog and get file containing tile geometry
-        QString fileName = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
+    QString fileName  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
 
-        // error checking
-        if (fileName == NULL) return;
+    // error checking
+    if (fileName == NULL) return;
 
-        // assign m_tiles to the OpenGL widget
-        m_glwidget->loadTiles(fileName);
-        m_glwidget->loadTexture();
-        m_glwidget->setTimer();
+    // assign m_tiles to the OpenGL widget
+    m_glwidget->loadTiles(fileName,0);
 
+    // launch file dialog and get file containing tile geometry
+    fileName  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
+
+    // error checking
+    if (fileName == NULL) return;
+
+    m_glwidget->loadTiles(fileName,1);
+
+    m_glwidget->loadTexture();
+
+    m_glwidget->setTimer();
 }
 
 
