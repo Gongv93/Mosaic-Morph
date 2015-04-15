@@ -149,7 +149,7 @@ void MainWindow::createLeftSideLayout()
 void  MainWindow::s_loadTiles ()
 {
     // launch file dialog and get file containing tile geometry
-        QString fileName = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
+        QString fileName  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
 
         // error checking
         if (fileName == NULL) return;

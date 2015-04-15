@@ -1,4 +1,5 @@
 
+
 #ifndef TILE_H
 #define TILE_H
 
@@ -31,7 +32,8 @@ public:
     QVector2D   centroid();
 
 private:
-    int         m_num;      // number of vertices 
+
+    int         m_num;      // number of vertices
     vector<QVector2D>   m_vertices; // coordinates
     QVector2D       m_centroid; // tile centroid
     QColor          m_color;    // tile color
@@ -42,3 +44,4 @@ private:
 };
 
 #endif  // TILE_H
+

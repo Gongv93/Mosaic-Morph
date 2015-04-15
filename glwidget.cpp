@@ -1,13 +1,13 @@
 
 
 #include "glwidget.h"
+#include <cmath>
 
 GLWidget::GLWidget()
 {
     m_tiles.clear();
     m_speedMulti      = 1.0f;    // Set angle multiplier
     m_r2              = 0.0f;
-
     m_scale           = 1.0;
 
     m_play            = false;
@@ -46,19 +46,19 @@ void GLWidget::initializeGL()
 
 void GLWidget::paintGL()
 {
-        // clear color and depth buffers
+    // clear color and depth buffers
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // add ambient light
     GLfloat ambientColor[] = {0.5f, 0.5f, 0.5f, 1.0f};
     glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambientColor);
-    
+
     // add positioned light
     GLfloat lightColor0[] = {0.5f, 0.5f, 0.5f, 1.0f};
     GLfloat lightPos0  [] = {4.0f, 0.0f, 8.0f, 1.0f};
     glLightfv(GL_LIGHT0, GL_DIFFUSE, lightColor0);
     glLightfv(GL_LIGHT0, GL_POSITION, lightPos0);
-    
+
     // add directed light
     GLfloat lightColor1[] = {0.5f, 0.5f, 0.5f, 1.0f};
     GLfloat lightPos1  [] = {-1.0f, 0.5f, 0.5f, 0.0f};
@@ -78,11 +78,11 @@ void GLWidget::paintGL()
     if(m_play) {
         // First scale down to .75
         if(m_scale > .75) {
-            m_scale = m_scale - (0.01 * m_speedMulti) ;
+            m_scale = m_scale - (0.005 * m_speedMulti) ;
         }
 
         // Then explode
-        if(m_scale <= .75) {
+        else {
             m_r2 += .003 * m_speedMulti;
             // Update each tile for the next render cycle
             int n_tiles = m_tiles.size();
@@ -90,6 +90,7 @@ void GLWidget::paintGL()
                 radialMotion(m_tiles[i]);
             }
         }
+
     }
 
 
@@ -140,7 +141,7 @@ void GLWidget::drawTiles()
         // draw centroid
         if(m_flagCentroid)
         {
-            glColor3f(1.0f, 1.0f, 1.0f);                    // Set color for point
+            glColor3f(1.0f, 1.0f, 1.0f);                    // Set white color for point
             glPointSize(4.0f);                              // Set point size
             glBegin(GL_POINTS);                             // set point mode
             glVertex3f(centroid.x(), centroid.y(), 0.0f);   // assign (x,y) coords
@@ -187,6 +188,19 @@ void GLWidget::drawTiles()
             glVertex3f(vtx.x(), vtx.y(), m_tiles[i].depth());      // assign vtx as next polygon vertex
         }
         glEnd();                                     // end polygon mode
+
+
+        for(int j=0; j<n_vtx-1;j++){
+               QVector2D vtx1 = m_tiles[i].vertex(j);
+               QVector2D vtx2 = m_tiles[i].vertex(j+1);
+
+               glBegin(GL_POLYGON);
+                   glVertex3f(vtx1.x(),vtx1.y(),m_tiles[i].depth());
+                   glVertex3f(vtx2.x(),vtx2.y(),m_tiles[i].depth());
+                   glVertex3f(vtx2.x(),vtx2.y(),m_tiles[i].depth()-.03);
+                   glVertex3f(vtx1.x(),vtx1.y(),m_tiles[i].depth()-.03);
+                glEnd();
+       }
 
         glDisable(GL_TEXTURE_2D);
 
@@ -290,7 +304,7 @@ void    GLWidget::loadTexture()
 
     //bind the texture ID
     glBindTexture(GL_TEXTURE_2D, m_texture);
-    
+
     //texture parameters
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
