@@ -78,11 +78,11 @@ void GLWidget::paintGL()
     if(m_play) {
         // First scale down to .75
         if(m_scale > .75) {
-            m_scale = m_scale - (0.01 * m_speedMulti) ;
+            m_scale -= (0.01 * m_speedMulti) ;
         }
 
         // Then explode
-        if(m_scale <= .75) {
+        else {
             m_r2 += .003 * m_speedMulti;
             // Update each tile for the next render cycle
             int n_tiles = m_tiles.size();
