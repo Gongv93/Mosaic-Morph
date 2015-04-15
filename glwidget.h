@@ -19,22 +19,24 @@ class GLWidget : public QGLWidget
          GLWidget();
         ~GLWidget();
 
-        void        setTiles(vector<Tile> &);
-        void        loadTiles	(QString &);
-        void        drawTiles();
-        void        setTimer();
+        void        setTiles        (vector<Tile> &);
+        void        loadTiles	    (QString &, int);
+        void        drawTiles       ();
+        void        setTimer        ();
         void        radialMotion    (Tile &);
-        void        loadTexture();
+        void        radialMotion2   (Tile &);
+        void        loadTexture     ();
+        void        loadTexture2    ();
         QVector3D   computeNormal   (QVector2D &, QVector2D &, float, float);
 
     public slots:
-        void s_Play();
-        void s_setSpeedMultiplier(int spinnerVal);
-        void s_setCentroid(int flag);
-        void s_setScale(int flag);
-        void s_setRotate(int flag);
+        void s_play                 ();
+        void s_setSpeedMultiplier   (int spinnerVal);
+        void s_setCentroid          (int flag);
+        void s_setScale             (int flag);
+        void s_setRotate            (int flag);
 
-        void    s_reset       ();
+        void    s_reset             ();
 
 
 
@@ -44,16 +46,21 @@ class GLWidget : public QGLWidget
         void resizeGL(int width, int height);
 
     private:
-        QString		    m_imgFileName;
         vector<Tile>    m_tiles;
+        vector<Tile>    m_tiles2;
         QTimer*         m_Timer;
         bool            m_play;
         bool            m_flagCentroid;
         bool            m_flagRotate;
         bool            m_flagScale;
 
-        float           m_r2;
         GLuint          m_texture;
+        GLuint          m_texture2;
+        QString         m_imgFileName;
+        QString         m_imgFileName2;
+
+        float           m_r2;
+        float           m_r22;
         float           m_speedMulti;
         float           m_scale;
 };

@@ -128,7 +128,7 @@ void MainWindow::createLeftSideLayout()
 
     //Signal Slot Connections
     connect(m_LoadButton,SIGNAL(clicked()),this, SLOT(s_loadTiles()));
-    connect(m_playPause, SIGNAL(clicked()), m_glwidget, SLOT(s_Play()));
+    connect(m_playPause, SIGNAL(clicked()), m_glwidget, SLOT(s_play()));
 
     connect(m_showCent,SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setCentroid(int)));
     connect(m_scaleTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setScale(int)));
@@ -149,16 +149,25 @@ void MainWindow::createLeftSideLayout()
 void  MainWindow::s_loadTiles ()
 {
     // launch file dialog and get file containing tile geometry
-        QString fileName  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
+    QString fileName  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
 
-        // error checking
-        if (fileName == NULL) return;
+    // error checking
+    if (fileName == NULL) return;
 
-        // assign m_tiles to the OpenGL widget
-        m_glwidget->loadTiles(fileName);
-        m_glwidget->loadTexture();
-        m_glwidget->setTimer();
+    // assign m_tiles to the OpenGL widget
+    m_glwidget->loadTiles(fileName,0);
 
+    // launch file dialog and get file containing tile geometry
+    fileName  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
+
+    // error checking
+    if (fileName == NULL) return;
+
+    m_glwidget->loadTiles(fileName,1);
+
+    m_glwidget->loadTexture();
+
+    m_glwidget->setTimer();
 }
 
 

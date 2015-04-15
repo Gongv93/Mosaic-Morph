@@ -1,13 +1,17 @@
 
 
+
+
 #include "glwidget.h"
 #include <cmath>
 
 GLWidget::GLWidget()
 {
     m_tiles.clear();
+
     m_speedMulti      = 0.4f;    // Set angle multiplier
     m_r2              = 0.0f;
+    m_r22             = 0.0f;
 
     m_scale           = 1.0;
 
@@ -72,7 +76,7 @@ void GLWidget::paintGL()
 
     // move camera and look at origin
     glTranslatef(0, 0, 3.0);
-    gluLookAt(0.0, -3.0, 5.0, 0, 0, 0, 0.0, 1.0, 0.0);
+    gluLookAt(0.0, -2.0, 4.0, 0, 0, 0, 0.0, 1.0, 0.0);
 
     drawTiles();
 
@@ -86,11 +90,22 @@ void GLWidget::paintGL()
         // Then explode
        else
         {
-            m_r2 += .003 * m_speedMulti;
-            // Update each tile for the next render cycle
-            int n_tiles = m_tiles.size();
-            for(int i = 0; i < n_tiles; ++i) {
-                radialMotion(m_tiles[i]);
+            if(m_r2 < 5) {
+                m_r2 += .003 * m_speedMulti;
+                // Update each tile for the next render cycle
+                int n_tiles = m_tiles.size();
+                for(int i = 0; i < n_tiles; ++i) {
+                    radialMotion(m_tiles[i]);
+                }
+            }
+
+            // When the first radius is greater than 2 second tile will fall
+            if(m_r2 > 0.05 &&  m_r22 < 5) {
+                m_r22 += .003 * m_speedMulti;
+                int n_tiles = m_tiles2.size();
+                for(int i = 0; i < n_tiles; ++i) {
+                    radialMotion2(m_tiles2[i]);
+                }
             }
         }
 
@@ -134,9 +149,9 @@ void GLWidget::setTiles(vector<Tile> &tiles)
 void GLWidget::drawTiles()
 {
     // error checking
-    if (m_tiles.empty()) return;
+    if (m_tiles.empty() || m_tiles2.empty()) return;
 
-    // for each tile, get color and draw polygon
+    // Render first set of tiles
     int n_tiles = m_tiles.size();
     for (int i = 0; i<n_tiles; ++i) {
         QVector2D centroid = m_tiles[i].centroid();
@@ -154,21 +169,6 @@ void GLWidget::drawTiles()
         // get tile color and pass it to OpenGL
         QColor color = m_tiles[i].color();
         glColor3f(color.redF(), color.greenF(), color.blueF());
-
-        /*
-        // Update tile transfomation params
-        if(m_flagRotate) {
-            m_angle += m_baseAngleSpeed * m_angleMulti;
-            if(m_angle >= 360.0)  m_angle = 0.0f;
-        }
-
-        // Scaling is done by a sine curve
-        if(m_flagScale) {
-            m_scale = 1.0 + (0.9 * qSin(m_scaleAngle * m_baseScaleFreq * m_angleMulti));
-            m_scaleAngle += 0.01f;
-            if(m_angle == 3.14) m_scaleAngle = 0.0;
-        }
-        */
 
         // Apply transformation
         glPushMatrix();
@@ -199,8 +199,8 @@ void GLWidget::drawTiles()
                glBegin(GL_POLYGON);
                    glVertex3f(vtx1.x(),vtx1.y(),m_tiles[i].depth());
                    glVertex3f(vtx2.x(),vtx2.y(),m_tiles[i].depth());
-                   glVertex3f(vtx2.x(),vtx2.y(),m_tiles[i].depth()-.03);
-                   glVertex3f(vtx1.x(),vtx1.y(),m_tiles[i].depth()-.03);
+                   glVertex3f(vtx2.x(),vtx2.y(),m_tiles[i].depth()-.02);
+                   glVertex3f(vtx1.x(),vtx1.y(),m_tiles[i].depth()-.02);
                 glEnd();
        }
 
@@ -209,46 +209,77 @@ void GLWidget::drawTiles()
         glPopMatrix();
     }
 
+    // Second set of tiles
+    n_tiles = m_tiles2.size();
+    for(int i = 0; i < n_tiles; ++i) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE, m_texture);
+
+        glBegin(GL_POLYGON);                         // set polygon mode
+        int n_vtx = m_tiles2[i].num();                // get number of tile vertices
+        for(int j = 0; j<n_vtx; ++j) {               // visit each tile vertex
+            QVector2D vtx = m_tiles2[i].vertex(j);    // assign (x,y) coords to vtx
+            glTexCoord2f(vtx.x() + 0.5, vtx.y() + 0.5);
+            glVertex3f(vtx.x(), vtx.y(), m_tiles2[i].depth());      // assign vtx as next polygon vertex
+        }
+        glEnd();                                     // end polygon mode
+
+        for(int j=0; j<n_vtx-1;j++){
+               QVector2D vtx1 = m_tiles2[i].vertex(j);
+               QVector2D vtx2 = m_tiles2[i].vertex(j+1);
+
+               glBegin(GL_POLYGON);
+                   glVertex3f(vtx1.x(),vtx1.y(),m_tiles2[i].depth());
+                   glVertex3f(vtx2.x(),vtx2.y(),m_tiles2[i].depth());
+                   glVertex3f(vtx2.x(),vtx2.y(),m_tiles2[i].depth()-.02);
+                   glVertex3f(vtx1.x(),vtx1.y(),m_tiles2[i].depth()-.02);
+                glEnd();
+       }
+
+        glDisable(GL_TEXTURE_2D);
+    }
+
+
 }
 
 
-void GLWidget::loadTiles(QString &fileName)
+void GLWidget::loadTiles(QString &fileName, int flag)
 {
 
         QFileInfo *info = new QFileInfo(fileName);
-        m_imgFileName = info->path() + "/" + info->baseName() + ".jpg";
+        if(flag == 0)
+            m_imgFileName = info->path() + "/" + info->baseName() + ".jpg";
 
         // open file for reading a stream of text
-        QFile	file(fileName);
+        QFile   file(fileName);
         file.open(QIODevice::ReadOnly | QIODevice::Text);
         QTextStream in(&file);
 
         // read first three lines to get mosaic width, height, and number of tiles;
         // start with first line: mosaic width
-        QString line = in.readLine();		// read mosaic width (inches)
-        int   w  = line.toInt();		// convert string to int
-        float w2 = w >> 1;			// half-width for computing center
+        QString line = in.readLine();       // read mosaic width (inches)
+        int   w  = line.toInt();        // convert string to int
+        float w2 = w >> 1;          // half-width for computing center
 
         // read second line: mosaic height
-        line = in.readLine();			// read mosaic height (inches)
-        int h  = line.toInt();			// convert string to int
-        int h2 = h >> 1;			// half-height for computing center
+        line = in.readLine();           // read mosaic height (inches)
+        int h  = line.toInt();          // convert string to int
+        int h2 = h >> 1;            // half-height for computing center
 
         // read third line: number of tiles
-        line = in.readLine();			// read number of tiles
-        int n_tiles = line.toInt();		// convert string to int
+        line = in.readLine();           // read number of tiles
+        int n_tiles = line.toInt();     // convert string to int
         for (int i = 0; i<n_tiles; ++i)
         {
             Tile tile;
-            line = in.readLine();		// read number of vertices
-            int n_vertices = line.toInt();	// convert string to int
-            tile.setNum(n_vertices);	// set it in tile class
-            tile.setDepth(0);
+            line = in.readLine();       // read number of vertices
+            int n_vertices = line.toInt();  // convert string to int
+            tile.setNum(n_vertices);    // set it in tile class
 
             // visit all vertices
             for (int j = 0; j<n_vertices; ++j)
             {
-                line = in.readLine();	// read coordinates
+                line = in.readLine();   // read coordinates
                 double x = line.section(',', 0, 0).toDouble();
                 double y = line.section(',', 1, 1).toDouble();
 
@@ -263,7 +294,14 @@ void GLWidget::loadTiles(QString &fileName)
             tile.setCentroid();
 
             // add tile to the m_tiles array
-            m_tiles.push_back(tile);
+            if(flag == 0) {
+                tile.setDepth(0);
+                m_tiles.push_back(tile);
+            }
+            if(flag == 1) {
+                tile.setDepth(2.5);
+                m_tiles2.push_back(tile);
+            }
         }
 
         // close file
@@ -296,17 +334,38 @@ void GLWidget::radialMotion(Tile &tile)
     }
 }
 
+void GLWidget::radialMotion2(Tile &tile)
+{
+    QVector2D cen = tile.centroid();
+    float dist2 = (cen.x()*cen.x() + cen.y()*cen.y());
+    if(dist2 <= m_r22) {
+        if(tile.depth() > 0) {
+            tile.updateDepth(-((rand() % 10000) / 500000.0));
+            if(tile.depth() < 0) tile.setDepth(0);
+        }
+    }
+}
+
 void    GLWidget::loadTexture()
 {
     QImage img(m_imgFileName);
-
-    QImage GL_formatted_image;
-    GL_formatted_image = QGLWidget::convertToGLFormat(img);
-
+    QImage GL_formatted_image = QGLWidget::convertToGLFormat(img);
     glGenTextures(1, &m_texture);
 
     //bind the texture ID
-    glBindTexture(GL_TEXTURE_2D, m_texture);
+    //glBindTexture(GL_TEXTURE_2D, m_texture[0]);
+
+    /*
+    else if(flag == 1) {
+        QImage img(m_imgFileName2);
+        GL_formatted_image = QGLWidget::convertToGLFormat(img);
+
+        glGenTextures(1, &m_texture2);
+
+        //bind the texture ID
+        glBindTexture(GL_TEXTURE_2D, m_texture2);
+    }
+    */
 
     //texture parameters
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
@@ -324,7 +383,7 @@ void    GLWidget::loadTexture()
 
 
 //Slot Functions:
-void GLWidget::s_Play()
+void GLWidget::s_play()
 {
     m_play =!m_play;
     if (m_play) m_Timer->start();
@@ -361,7 +420,15 @@ void GLWidget::s_reset()
         m_tiles[i].setDepth(0);
         m_tiles[i].setAngles(0.0, 0.0, 0.0);
     }
+
+    n_tiles = m_tiles2.size();
+    for(int i = 0; i < n_tiles; ++i) {
+        m_tiles2[i].setDepth(2.5);
+        m_tiles2[i].setAngles(0.0, 0.0, 0.0);
+    }
+
     m_scale = 1.0;
-    m_r2 = 0.0;
+    m_r2    = 0.0;
+    m_r22   = 0.0;
 }
 
