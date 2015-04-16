@@ -1,3 +1,8 @@
+/* ========================================================================
+   File:    mainwindow.h
+   Class:   Senior Design Csc 59866
+   Creator: Asad Kamal, Vincent Gong, RuLong Haung
+   ======================================================================== */
 
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -37,14 +42,7 @@ public slots:
      void    s_saveAs      ();
      void    s_quit        ();
 
-
      void    s_resetWidget        ();
-     void    s_resetRotateChecked ();
-     void    s_resetScaleChecked  ();
-     void    s_resetCentroid      ();
-     void    s_resetSlider        ();
-     void    s_resetSpinBox       ();
-
 
 private:
      //***Create Menu***
@@ -88,9 +86,6 @@ private:
 
      vector<Tile>    m_tiles;     // array of mosaic tiles
      GLWidget       *m_glwidget; // widget in which to draw
-
-
-
 };
 
 #endif // MAINWINDOW_H
