@@ -26,6 +26,10 @@ class GLWidget : public QGLWidget
         void        radialMotion    (Tile &);
         void        radialMotion2   (Tile &);
         void        loadTexture     ();
+<<<<<<< HEAD
+=======
+        void        loadTexture2    ();
+>>>>>>> e9619796b7b9adbc1a6b0010eb656c406ad85bbf
         QVector3D   computeNormal   (QVector2D &, QVector2D &, float, float);
 
     public slots:
@@ -54,8 +58,15 @@ class GLWidget : public QGLWidget
         bool            m_flagScale;
 
         GLuint          m_texture;
+<<<<<<< HEAD
         QString         m_imgFileName;
         
+=======
+        GLuint          m_texture2;
+        QString         m_imgFileName;
+        QString         m_imgFileName2;
+
+>>>>>>> e9619796b7b9adbc1a6b0010eb656c406ad85bbf
         float           m_r2;
         float           m_r22;
         float           m_speedMulti;

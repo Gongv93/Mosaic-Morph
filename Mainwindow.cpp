@@ -128,7 +128,7 @@ void MainWindow::createLeftSideLayout()
 
     //Signal Slot Connections
     connect(m_LoadButton,SIGNAL(clicked()),this, SLOT(s_loadTiles()));
-    connect(m_playPause, SIGNAL(clicked()), m_glwidget, SLOT(s_Play()));
+    connect(m_playPause, SIGNAL(clicked()), m_glwidget, SLOT(s_play()));
 
     connect(m_showCent,SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setCentroid(int)));
     connect(m_scaleTiles, SIGNAL(stateChanged(int)), m_glwidget, SLOT(s_setScale(int)));

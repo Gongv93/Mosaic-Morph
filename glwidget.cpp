@@ -1,5 +1,7 @@
 
 
+
+
 #include "glwidget.h"
 #include <cmath>
 
@@ -96,7 +98,7 @@ void GLWidget::paintGL()
                     radialMotion(m_tiles[i]);
                 }
             }
-               
+
             // When the first radius is greater than 2 second tile will fall
             if(m_r2 > 0.05 &&  m_r22 < 5) {
                 m_r22 += .003 * m_speedMulti;
@@ -238,6 +240,37 @@ void GLWidget::drawTiles()
     }
     
 
+    // Second set of tiles
+    n_tiles = m_tiles2.size();
+    for(int i = 0; i < n_tiles; ++i) {
+        glEnable(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE, m_texture);
+
+        glBegin(GL_POLYGON);                         // set polygon mode
+        int n_vtx = m_tiles2[i].num();                // get number of tile vertices
+        for(int j = 0; j<n_vtx; ++j) {               // visit each tile vertex
+            QVector2D vtx = m_tiles2[i].vertex(j);    // assign (x,y) coords to vtx
+            glTexCoord2f(vtx.x() + 0.5, vtx.y() + 0.5);
+            glVertex3f(vtx.x(), vtx.y(), m_tiles2[i].depth());      // assign vtx as next polygon vertex
+        }
+        glEnd();                                     // end polygon mode
+
+        for(int j=0; j<n_vtx-1;j++){
+               QVector2D vtx1 = m_tiles2[i].vertex(j);
+               QVector2D vtx2 = m_tiles2[i].vertex(j+1);
+
+               glBegin(GL_POLYGON);
+                   glVertex3f(vtx1.x(),vtx1.y(),m_tiles2[i].depth());
+                   glVertex3f(vtx2.x(),vtx2.y(),m_tiles2[i].depth());
+                   glVertex3f(vtx2.x(),vtx2.y(),m_tiles2[i].depth()-.02);
+                   glVertex3f(vtx1.x(),vtx1.y(),m_tiles2[i].depth()-.02);
+                glEnd();
+       }
+
+        glDisable(GL_TEXTURE_2D);
+    }
+
+
 }
 
 
@@ -245,7 +278,8 @@ void GLWidget::loadTiles(QString &fileName, int flag)
 {
 
         QFileInfo *info = new QFileInfo(fileName);
-        if(flag == 0) 
+
+        if(flag == 0)
             m_imgFileName = info->path() + "/" + info->baseName() + ".jpg";
 
         // open file for reading a stream of text
@@ -348,23 +382,13 @@ void    GLWidget::loadTexture()
 {
     QImage img(m_imgFileName);
     QImage GL_formatted_image = QGLWidget::convertToGLFormat(img);
-    glGenTextures(2, &m_texture);
+
+    glGenTextures(1, &m_texture);
 
     //bind the texture ID
-    //glBindTexture(GL_TEXTURE_2D, m_texture[0]);
+    glBindTexture(GL_TEXTURE_2D, m_texture);
     
-    /*
-    else if(flag == 1) {
-        QImage img(m_imgFileName2);
-        GL_formatted_image = QGLWidget::convertToGLFormat(img);
-
-        glGenTextures(1, &m_texture2);
-
-        //bind the texture ID
-        glBindTexture(GL_TEXTURE_2D, m_texture2);
-    }
-    */
-    
+   
     //texture parameters
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
     glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
