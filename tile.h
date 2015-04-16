@@ -1,3 +1,9 @@
+/* ========================================================================
+   File:    tile.h
+   Class:   Senior Design Csc 59866
+   Creator: Asad Kamal, Vincent Gong, RuLong Haung
+   ======================================================================== */
+
 #ifndef TILE_H
 #define TILE_H
 
@@ -30,14 +36,14 @@ public:
     QVector2D   centroid();
 
 private:
-    int         m_num;      // number of vertices 
+    int                 m_num;      // number of vertices 
     vector<QVector2D>   m_vertices; // coordinates
-    QVector2D       m_centroid; // tile centroid
-    QColor          m_color;    // tile color
-    float           m_depth;
-    float           m_angleX;
-    float           m_angleY;
-    float           m_angleZ;
+    QVector2D           m_centroid; // tile centroid
+    QColor              m_color;    // tile color
+    float               m_depth;
+    float               m_angleX;
+    float               m_angleY;
+    float               m_angleZ;
 };
 
 #endif  // TILE_H

@@ -1,3 +1,8 @@
+/* ========================================================================
+   File:    glwidget.h
+   Class:   Senior Design Csc 59866
+   Creator: Asad Kamal, Vincent Gong, RuLong Haung
+   ======================================================================== */
 
 #ifndef GLWIDGET_H
 #define GLWIDGET_H
@@ -10,7 +15,6 @@
 #include <vector>
 #include "Tile.h"
 
-
 class GLWidget : public QGLWidget
 {
     Q_OBJECT
@@ -19,31 +23,26 @@ class GLWidget : public QGLWidget
          GLWidget();
         ~GLWidget();
 
-        void        setTiles        (vector<Tile> &);
-        void        loadTiles	    (QString &, int);
-        void        drawTiles       ();
-        void        setTimer        ();
-        void        radialMotion    (Tile &);
-        void        radialMotion2   (Tile &);
-        void        loadTexture     ();
-
-        QVector3D   computeNormal   (QVector2D &, QVector2D &, float, float);
+        void loadTiles	     (QString &, int);
+        void drawTiles       ();
+        void setTimer        ();
+        void radialMotion    (Tile &);
+        void radialMotion2   (Tile &);
+        void loadTexture     ();
+        void loadTexture2    ();
 
     public slots:
         void s_play                 ();
-        void s_setSpeedMultiplier   (int spinnerVal);
-        void s_setCentroid          (int flag);
-        void s_setScale             (int flag);
-        void s_setRotate            (int flag);
-
-        void    s_reset             ();
-
-
+        void s_setSpeedMultiplier   (int);
+        void s_setCentroid          (int);
+        void s_setScale             (int);
+        void s_setRotate            (int);
+        void s_reset                ();
 
     protected:
-        void initializeGL();
-        void paintGL();
-        void resizeGL(int width, int height);
+        void initializeGL   ();
+        void paintGL        ();
+        void resizeGL       (int, int);
 
     private:
         vector<Tile>    m_tiles;

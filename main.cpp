@@ -1,7 +1,19 @@
+/* ========================================================================
+   File:    main.cpp
+   Class:   Senior Design Csc 59866
+   Creator: Asad Kamal, Vincent Gong, RuLong Haung
+   ======================================================================== */
+
 #include "Mainwindow.h"
 #include <QtWidgets>
 #include <QApplication>
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// main:
+//
+// Main function where it all begins.
+//
 
 int main(int argc, char *argv[])
 {
