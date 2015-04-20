@@ -1,12 +1,15 @@
-
-/********** Senior Design Csc 59866 Section:
- ********** Asad Kamal     Email:
- ********** Vincent Gong   Email:
- ********** RuLong Huang   Email:
-*/
+/* ========================================================================
+   File:    Mainwindow.cpp
+   Class:   Senior Design Csc 59866
+   Creator: Asad Kamal, Vincent Gong, RuLong Haung
+   ======================================================================== */
 
 #include "Mainwindow.h"
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// Class Constructor
+//
 
 MainWindow::MainWindow()
 {
@@ -16,73 +19,21 @@ MainWindow::MainWindow()
     createLeftSideLayout();
 }
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// Class Destructor
+//
+
 MainWindow::~MainWindow()
-{
+{}
 
-}
-
-
-void MainWindow::createActionsFile()
-{
-    //File : Load Tiles
-    m_actionLoadTiles = new QAction ("&Load Tiles",this);
-    m_actionLoadTiles -> setShortcut(tr("Ctrl+L"));
-    connect(m_actionLoadTiles, SIGNAL(triggered()), this, SLOT(s_loadTiles()));
-
-    //File : Save
-    m_actionSave = new QAction ("&Save", this);
-    m_actionSave -> setShortcut(tr("Ctrl+S"));
-    connect(m_actionSave, SIGNAL(triggered()),this, SLOT(s_save()));
-
-    //File : Save-As
-    m_actionSaveAs = new QAction ("&SaveAs", this);
-    m_actionSaveAs -> setShortcut(tr("Ctrl+Shift+S"));
-    connect(m_actionSaveAs, SIGNAL(triggered()),this, SLOT(s_saveAs()));
-
-    //File : Quit
-    m_actionQuit = new QAction ("&Quit", this);
-    m_actionQuit -> setShortcut(tr("Ctrl+Q"));
-    connect(m_actionQuit, SIGNAL(triggered()),this, SLOT(s_quit()));
-}
-
-//Associating the actions with File Menu
-void MainWindow::createMenuFile()
-{
-    m_menuFile = menuBar()->addMenu(tr("&File"));
-    m_menuFile->addAction(m_actionLoadTiles);
-    m_menuFile->addSeparator();
-    m_menuFile->addAction(m_actionSave);
-    m_menuFile->addAction(m_actionSaveAs);
-    m_menuFile->addSeparator();
-    m_menuFile->addAction(m_actionQuit);
-}
-
-
-void MainWindow::createWidget()
-{
-    //Making Horizontal Slider
-    m_slider = new QSlider(Qt::Horizontal);
-    m_slider ->setMinimum(1);
-    m_slider->setMaximum(10);
-    m_slider->setValue(1);
-
-    //Making SpinBox
-    m_spinBox = new QSpinBox;
-    m_spinBox ->setMinimum(1);
-    m_spinBox ->setMaximum(10);
-    m_spinBox ->setValue(1);
-
-    //Creating Push Buttons: Load & Play/Pause
-    m_LoadButton = new QPushButton("Load");
-    m_playPause  = new QPushButton("Play/Pause");
-    m_reset      = new QPushButton("Reset");
-
-    //Creating Checked Boxes
-    m_scaleTiles  = new QCheckBox("Scale Tiles");
-    m_rotateTiles = new QCheckBox("Rotate Tiles");
-    m_showCent    = new QCheckBox("Show Centroid");
-}
-
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// createLeftSideLayout:
+//
+// Creats our layout for the left side of the window. We also set
+// our connections to slot functions.
+//
 
 void MainWindow::createLeftSideLayout()
 {
@@ -141,10 +92,99 @@ void MainWindow::createLeftSideLayout()
     //Reset Signal-Slot Connection
     connect(m_reset, SIGNAL(clicked()),m_glwidget, SLOT(s_reset()));
     connect(m_reset, SIGNAL(clicked()),this, SLOT(s_resetWidget()));
+}
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// createActionFiles:
+//
+// Creates actions as well as apply them to certain key short cuts.
+//
+
+void MainWindow::createActionsFile()
+{
+    //File : Load Tiles
+    m_actionLoadTiles = new QAction ("&Load Tiles",this);
+    m_actionLoadTiles -> setShortcut(tr("Ctrl+L"));
+    connect(m_actionLoadTiles, SIGNAL(triggered()), this, SLOT(s_loadTiles()));
+
+    //File : Save
+    m_actionSave = new QAction ("&Save", this);
+    m_actionSave -> setShortcut(tr("Ctrl+S"));
+    connect(m_actionSave, SIGNAL(triggered()),this, SLOT(s_save()));
+
+    //File : Save-As
+    m_actionSaveAs = new QAction ("&SaveAs", this);
+    m_actionSaveAs -> setShortcut(tr("Ctrl+Shift+S"));
+    connect(m_actionSaveAs, SIGNAL(triggered()),this, SLOT(s_saveAs()));
+
+    //File : Quit
+    m_actionQuit = new QAction ("&Quit", this);
+    m_actionQuit -> setShortcut(tr("Ctrl+Q"));
+    connect(m_actionQuit, SIGNAL(triggered()),this, SLOT(s_quit()));
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// createMenuFile:
+//
+// Adds actions to our drop down menu.
+//
+
+void MainWindow::createMenuFile()
+{
+    m_menuFile = menuBar()->addMenu(tr("&File"));
+    m_menuFile->addAction(m_actionLoadTiles);
+    m_menuFile->addSeparator();
+    m_menuFile->addAction(m_actionSave);
+    m_menuFile->addAction(m_actionSaveAs);
+    m_menuFile->addSeparator();
+    m_menuFile->addAction(m_actionQuit);
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// createWidget:
+//
+// Creates our slider, spinbox, load, play/pause, and check boxes.
+// We also initialzie these widgets with certain values.
+//
+
+void MainWindow::createWidget()
+{
+    //Making Horizontal Slider
+    m_slider = new QSlider(Qt::Horizontal);
+    m_slider ->setMinimum(1);
+    m_slider->setMaximum(10);
+    m_slider->setValue(1);
+
+    //Making SpinBox
+    m_spinBox = new QSpinBox;
+    m_spinBox ->setMinimum(1);
+    m_spinBox ->setMaximum(10);
+    m_spinBox ->setValue(1);
+
+    //Creating Push Buttons: Load & Play/Pause
+    m_LoadButton = new QPushButton("Load");
+    m_playPause  = new QPushButton("Play/Pause");
+    m_reset      = new QPushButton("Reset");
+
+    //Creating Checked Boxes
+    m_scaleTiles  = new QCheckBox("Scale Tiles");
+    m_rotateTiles = new QCheckBox("Rotate Tiles");
+    m_showCent    = new QCheckBox("Show Centroid");
 }
 
 //Slot Functions:
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// loadTiles:
+//
+// Prompts the user to pick the files for the tiles. We then load
+// the tiles into our GLWidget as well as load the textures. lastly
+// we set the timer for our widget.
+//
 
 void  MainWindow::s_loadTiles ()
 {
@@ -156,16 +196,16 @@ void  MainWindow::s_loadTiles ()
 
     // assign m_tiles to the OpenGL widget
     m_glwidget->loadTiles(fileName,0);
+    m_glwidget->loadTexture();
 
     // launch file dialog and get file containing tile geometry
-    fileName  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
+    QString fileName2  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
 
     // error checking
-    if (fileName == NULL) return;
+    if (fileName2 == NULL) return;
 
-    m_glwidget->loadTiles(fileName,1);
-
-    m_glwidget->loadTexture();
+    m_glwidget->loadTiles(fileName2,1);
+    m_glwidget->loadTexture2();
 
     m_glwidget->setTimer();
 }
@@ -174,46 +214,33 @@ void  MainWindow::s_loadTiles ()
 void MainWindow::s_save       () {}
 void MainWindow::s_saveAs     () {}
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// s_quit:
+//
+// Exits the program
+//
 
-// Slot Function for Quiting Project
 void MainWindow::s_quit()
 {
-   exit(0);
+    delete m_glwidget;
+    exit(0);
 }
 
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// s_resetWidget:
+//
+// Resets our widgets in our left layout back to their initial state.
+//
 
-//Reset Slot Functions
 void MainWindow::s_resetWidget()
 {
-    s_resetRotateChecked();
-    s_resetScaleChecked();
-    s_resetCentroid();
-    s_resetSlider();
-    s_resetSpinBox();
-}
-
-void MainWindow::s_resetRotateChecked()
-{
     m_rotateTiles->setChecked(false);
-}
-
-void MainWindow::s_resetScaleChecked()
-{
-    m_scaleTiles->setChecked(false);
-}
-
-void  MainWindow::s_resetCentroid  ()
-{
+    m_rotateTiles->setChecked(false);
     m_showCent->setChecked(false);
-}
-
-void MainWindow::s_resetSlider()
-{
     m_slider-> setValue(1);
-}
-
-void MainWindow::s_resetSpinBox()
-{
     m_spinBox ->setValue(1);
 }
+
 
