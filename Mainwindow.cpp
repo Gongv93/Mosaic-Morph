@@ -43,7 +43,9 @@ void MainWindow::createLeftSideLayout()
     QHBoxLayout *HorzButtons = new QHBoxLayout;
     HorzButtons -> addWidget(m_LoadButton);
     HorzButtons -> addWidget(m_playPause);
+    HorzButtons -> addWidget(m_morph);
     HorzButtons -> addWidget(m_reset);
+
 
     //2. Adding Slider/SpinBox widget to a hBox
     QLabel *speed = new QLabel("Speed");
@@ -168,6 +170,7 @@ void MainWindow::createWidget()
     m_LoadButton = new QPushButton("Load");
     m_playPause  = new QPushButton("Play/Pause");
     m_reset      = new QPushButton("Reset");
+    m_morph      = new QPushButton("Morph");
 
     //Creating Checked Boxes
     m_scaleTiles  = new QCheckBox("Scale Tiles");

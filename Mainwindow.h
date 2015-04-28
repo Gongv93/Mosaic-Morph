@@ -71,6 +71,7 @@ private:
      QPushButton *m_LoadButton;
      QPushButton *m_playPause;
      QPushButton *m_reset;
+     QPushButton *m_morph;
 
      //Check Boxes
      QCheckBox   *m_scaleTiles;
