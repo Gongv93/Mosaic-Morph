@@ -19,7 +19,7 @@ class Tile {
 public:
     Tile();
     void        setNum(int num);
-    int     num();
+    int         num();
     void        addVertex(QVector2D &);
     void        setRandColor();
     float       depth();

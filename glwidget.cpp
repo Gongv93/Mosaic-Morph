@@ -159,7 +159,7 @@ void GLWidget::paintGL()
                 }
             }
 
-            // When the first radius is greater than 2 second tile will fall
+            // When the first radius is greater, than 2 second tile will fall
             if(m_r2 > 0.05 &&  m_r22 < 5) {
                 m_r22 += .003 * m_speedMulti;
                 int n_tiles = m_tiles2.size();
