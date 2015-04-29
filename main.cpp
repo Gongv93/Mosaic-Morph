@@ -4,6 +4,12 @@
    Creator: Asad Kamal, Vincent Gong, RuLong Haung
    ======================================================================== */
 
+/*
+    MOSAIC_VERSION
+     0 - Build for tile morph
+     1 - Build for explosion
+*/
+
 #include "Mainwindow.h"
 #include <QtWidgets>
 #include <QApplication>

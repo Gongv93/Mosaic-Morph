@@ -13,7 +13,11 @@
 #include <QtCore/qmath.h>
 #include <GL/glu.h>
 #include <vector>
+#include <cmath>
 #include "Tile.h"
+#if !MOSAIC_VERSION
+#include "InterTile.h"
+#endif
 
 class GLWidget : public QGLWidget
 {
@@ -26,10 +30,15 @@ class GLWidget : public QGLWidget
         void loadTiles	     (QString &, int);
         void drawTiles       ();
         void setTimer        ();
+        void updateTiles     ();
+
         void radialMotion    (Tile &);
         void radialMotion2   (Tile &);
         void loadTexture     ();
         void loadTexture2    ();
+
+        void getMorph        ();
+
 
     public slots:
         void s_play                 ();
@@ -53,15 +62,24 @@ class GLWidget : public QGLWidget
         bool            m_flagRotate;
         bool            m_flagScale;
 
-        GLuint          m_texture;
         QString         m_imgFileName;
-        GLuint          m_texture2;
         QString         m_imgFileName2;
 
-        float           m_r2;
-        float           m_r22;
         float           m_speedMulti;
         float           m_scale;
+
+#if MOSAIC_VERSION
+        GLuint          m_texture;
+        GLuint          m_texture2;
+        float           m_r2;
+        float           m_r22;
+#else
+        int             m_state;
+        Tile            m_morphTile;
+        InterTile       m_interTile;
+        float           m_t;
+#endif
+
 };
 
 #endif  // GLWIDGET_H

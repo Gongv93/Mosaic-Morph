@@ -49,6 +49,11 @@ void Tile::addVertex(QVector2D &vtx)
     m_vertices.push_back(vtx);
 }
 
+void Tile::setVertex(int i, QVector2D vtx)
+{
+    m_vertices[i] = vtx;
+}
+
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 // vertex:
