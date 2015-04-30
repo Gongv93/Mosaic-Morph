@@ -128,7 +128,7 @@ void InterTile::InterPolate(float t, Tile &tile)
     for(uint i=0; i < m_source.size(); ++i) {
         QVector2D &src = m_source[i];
         QVector2D &des = m_destination[i];
-        QVector2D inter(src*(1-t)*des*t);
+        QVector2D inter(src*(1-t)+des*t);
         tile.addVertex(inter);
     }
 }

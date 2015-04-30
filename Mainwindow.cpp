@@ -188,7 +188,6 @@ void MainWindow::createWidget()
 
 void MainWindow::s_loadTiles ()
 {
-
     QString fileName  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
 
     // error checking
@@ -209,7 +208,6 @@ void MainWindow::s_loadTiles ()
     m_glwidget->loadTiles(fileName2,1);
     m_glwidget->loadTexture2();
 
-    m_glwidget->setTimer();
 #else
     QString fileName2  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
 
@@ -221,6 +219,8 @@ void MainWindow::s_loadTiles ()
     // Once both tile is loaded find initial and final for morph
     m_glwidget->getMorph();
 #endif
+
+    m_glwidget->setTimer();
 }
 
 

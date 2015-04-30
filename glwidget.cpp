@@ -139,15 +139,16 @@ void GLWidget::paintGL()
 
     // move camera and look at origin
     glTranslatef(0, 0, 3.0);
-    //gluLookAt(0.0, -2.0, 4.0, 0, 0, 0, 0.0, 1.0, 0.0);
-    gluLookAt(0.0, 0.0, 1.0, 0, 0, 0, 0.0, 1.0, 0.0);
-
+#if MOSAIC_VERSION
+    gluLookAt(0.0, -2.0, 4.0, 0, 0, 0, 0.0, 1.0, 0.0);
+#else
+    gluLookAt(0.0, 0.0, 4.0, 0, 0, 0, 0.0, 1.0, 0.0);
+#endif
     // Render our tiles
     drawTiles();
 
     // Update our tiles for next frame
     updateTiles();
-
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -254,6 +255,7 @@ void GLWidget::drawTiles()
 #else
 
     if(m_morphTile.num() == 0) return;
+    //if(m_tiles.empty()) return;
 
     glColor3f(1.0,1.0,1.0);
 
@@ -304,10 +306,10 @@ void GLWidget::updateTiles()
         // Increase
         case 0:
         {
-            m_t += .01f;
-            if(m_t >= 1) {
+            m_t += 0.005f * m_speedMulti;
+            if(m_t >= 1.0) {
                 // Make sure it doesnt go past 1 and change state
-                m_t = 1;
+                m_t = 1.0;
                 m_state = 1;
             }
         } break;
@@ -315,10 +317,10 @@ void GLWidget::updateTiles()
         // Decrease
         case 1:
         {
-            m_t -= .01f;
-            if(m_t <= 0) {
+            m_t -= 0.005f * m_speedMulti;
+            if(m_t <= 0.0) {
                 // Make sure it doesnt go past 0 and change state
-                m_t = 0;
+                m_t = 0.0;
                 m_state = 0;
             }
         } break;
@@ -436,7 +438,7 @@ void GLWidget::loadTexture2()
 void GLWidget::getMorph()
 {
     m_interTile.FindSourceDest(m_tiles[0], m_tiles2[0]);
-    m_interTile.InterPolate(m_t, m_morphTile);
+    m_interTile.InterPolate(0, m_morphTile);
 }
 
 #endif
