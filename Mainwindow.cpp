@@ -43,9 +43,7 @@ void MainWindow::createLeftSideLayout()
     QHBoxLayout *HorzButtons = new QHBoxLayout;
     HorzButtons -> addWidget(m_LoadButton);
     HorzButtons -> addWidget(m_playPause);
-    HorzButtons -> addWidget(m_morph);
     HorzButtons -> addWidget(m_reset);
-
 
     //2. Adding Slider/SpinBox widget to a hBox
     QLabel *speed = new QLabel("Speed");
@@ -170,7 +168,6 @@ void MainWindow::createWidget()
     m_LoadButton = new QPushButton("Load");
     m_playPause  = new QPushButton("Play/Pause");
     m_reset      = new QPushButton("Reset");
-    m_morph      = new QPushButton("Morph");
 
     //Creating Checked Boxes
     m_scaleTiles  = new QCheckBox("Scale Tiles");
@@ -189,9 +186,8 @@ void MainWindow::createWidget()
 // we set the timer for our widget.
 //
 
-void  MainWindow::s_loadTiles ()
+void MainWindow::s_loadTiles ()
 {
-    // launch file dialog and get file containing tile geometry
     QString fileName  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
 
     // error checking
@@ -199,6 +195,8 @@ void  MainWindow::s_loadTiles ()
 
     // assign m_tiles to the OpenGL widget
     m_glwidget->loadTiles(fileName,0);
+
+#if MOSAIC_VERSION
     m_glwidget->loadTexture();
 
     // launch file dialog and get file containing tile geometry
@@ -209,6 +207,18 @@ void  MainWindow::s_loadTiles ()
 
     m_glwidget->loadTiles(fileName2,1);
     m_glwidget->loadTexture2();
+
+#else
+    QString fileName2  = QFileDialog::getOpenFileName(this, "Open Tiles", "", "Tiles (*.txt)");
+
+    // error checking
+    if (fileName2 == NULL) return;
+
+    m_glwidget->loadTiles(fileName2,1);
+
+    // Once both tile is loaded find initial and final for morph
+    m_glwidget->getMorph();
+#endif
 
     m_glwidget->setTimer();
 }

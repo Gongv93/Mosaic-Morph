@@ -5,7 +5,6 @@
    ======================================================================== */
 
 #include "glwidget.h"
-#include <cmath>
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -14,14 +13,16 @@
 
 GLWidget::GLWidget()
 {
-    // Clear any exsiting tiles
-    m_tiles.clear();
-    m_tiles2.clear();
-
     m_speedMulti      = 0.4f;   // Set angle multiplier
+    m_scale           = 1.0;    // Set Scale factor
+#if MOSAIC_VERSION
     m_r2              = 0.0f;   // Set Radius 1
     m_r22             = 0.0f;   // Set Radius 2
-    m_scale           = 1.0;    // Set Scale factor
+#else
+    m_t = 0.0;
+    m_state = 0;
+#endif
+
 
     m_play            = false;  // Set play flag
     m_flagCentroid    = false;  // Set centroid flag
@@ -138,37 +139,16 @@ void GLWidget::paintGL()
 
     // move camera and look at origin
     glTranslatef(0, 0, 3.0);
+#if MOSAIC_VERSION
     gluLookAt(0.0, -2.0, 4.0, 0, 0, 0, 0.0, 1.0, 0.0);
-
+#else
+    gluLookAt(0.0, 0.0, 4.0, 0, 0, 0, 0.0, 1.0, 0.0);
+#endif
+    // Render our tiles
     drawTiles();
 
-    if(m_play) {
-        // First scale down to .75
-        if(m_scale > .75) {
-            m_scale = m_scale - (0.005 * m_speedMulti) ;
-        }
-
-        // Then explode
-        else {
-            if(m_r2 < 5) {
-                m_r2 += .003 * m_speedMulti;
-                // Update each tile for the next render cycle
-                int n_tiles = m_tiles.size();
-                for(int i = 0; i < n_tiles; ++i) {
-                    radialMotion(m_tiles[i]);
-                }
-            }
-
-            // When the first radius is greater, than 2 second tile will fall
-            if(m_r2 > 0.05 &&  m_r22 < 5) {
-                m_r22 += .003 * m_speedMulti;
-                int n_tiles = m_tiles2.size();
-                for(int i = 0; i < n_tiles; ++i) {
-                    radialMotion2(m_tiles2[i]);
-                }
-            }
-        }
-    }
+    // Update our tiles for next frame
+    updateTiles();
 }
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -181,6 +161,7 @@ void GLWidget::paintGL()
 
 void GLWidget::drawTiles()
 {
+#if MOSAIC_VERSION
     // error checking
     if (m_tiles.empty() || m_tiles2.empty()) return;
 
@@ -271,8 +252,89 @@ void GLWidget::drawTiles()
 
         glDisable(GL_TEXTURE_2D);
     }
+#else
+
+    if(m_morphTile.num() == 0) return;
+    //if(m_tiles.empty()) return;
+
+    glColor3f(1.0,1.0,1.0);
+
+    glBegin(GL_POLYGON);                                    // set polygon mode
+    int n_vtx = m_morphTile.num();                           // get number of tile vertices
+    for(int j = 0; j<n_vtx; ++j) {                          // visit each tile vertex
+        QVector2D vtx = m_morphTile.vertex(j);
+        glVertex3f(vtx.x(), vtx.y(), 0.0);   // assign vtx as next polygon vertex
+    }
+    glEnd();                                                // end polygon mode
+
+#endif
 }
 
+void GLWidget::updateTiles()
+{
+#if MOSAIC_VERSION
+    if(m_play) {
+        // First scale down to .75
+        if(m_scale > .75) {
+            m_scale = m_scale - (0.005 * m_speedMulti) ;
+        }
+
+        // Then explode
+        else {
+            if(m_r2 < 5) {
+                m_r2 += .003 * m_speedMulti;
+                // Update each tile for the next render cycle
+                int n_tiles = m_tiles.size();
+                for(int i = 0; i < n_tiles; ++i) {
+                    radialMotion(m_tiles[i]);
+                }
+            }
+
+            // When the first radius is greater than 2 second tile will fall
+            if(m_r2 > 0.05 &&  m_r22 < 5) {
+                m_r22 += .003 * m_speedMulti;
+                int n_tiles = m_tiles2.size();
+                for(int i = 0; i < n_tiles; ++i) {
+                    radialMotion2(m_tiles2[i]);
+                }
+            }
+        }
+    }
+#else
+
+    switch(m_state) {
+        // Increase
+        case 0:
+        {
+            m_t += 0.005f * m_speedMulti;
+            if(m_t >= 1.0) {
+                // Make sure it doesnt go past 1 and change state
+                m_t = 1.0;
+                m_state = 1;
+            }
+        } break;
+
+        // Decrease
+        case 1:
+        {
+            m_t -= 0.005f * m_speedMulti;
+            if(m_t <= 0.0) {
+                // Make sure it doesnt go past 0 and change state
+                m_t = 0.0;
+                m_state = 0;
+            }
+        } break;
+    }
+
+    Tile tempTile;
+    m_interTile.InterPolate(m_t, tempTile);
+    m_morphTile = tempTile;
+
+#endif
+
+}
+
+#if MOSAIC_VERSION
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
 // radialMotion:
@@ -310,6 +372,76 @@ void GLWidget::radialMotion2(Tile &tile)
         }
     }
 }
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// loadTexture:
+//
+// Loads our texture for our first set of tiles.
+//
+
+void GLWidget::loadTexture()
+{
+    QImage img(m_imgFileName);
+    QImage GL_formatted_image = QGLWidget::convertToGLFormat(img);
+
+    glGenTextures(1, &m_texture);
+
+    //bind the texture ID
+    glBindTexture(GL_TEXTURE_2D, m_texture);
+
+
+    //texture parameters
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //generate the texture
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, GL_formatted_image.width(),
+                  GL_formatted_image.height(),
+                  0, GL_RGBA, GL_UNSIGNED_BYTE, GL_formatted_image.bits() );
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+}
+
+// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+// loadTexture2:
+//
+// Loads our texture for our second set of tiles.
+//
+
+void GLWidget::loadTexture2()
+{
+    QImage img2(m_imgFileName2);
+    QImage GL_formatted_image2 = QGLWidget::convertToGLFormat(img2);
+
+    glGenTextures(2, &m_texture2);
+
+    //bind the texture ID
+    glBindTexture(GL_TEXTURE_2D, m_texture2);
+
+
+    //texture parameters
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    //generate the texture
+    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, GL_formatted_image2.width(),
+                  GL_formatted_image2.height(),
+                  0, GL_RGBA, GL_UNSIGNED_BYTE, GL_formatted_image2.bits() );
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+}
+
+#else
+
+void GLWidget::getMorph()
+{
+    m_interTile.FindSourceDest(m_tiles[0], m_tiles2[0]);
+    m_interTile.InterPolate(0, m_morphTile);
+}
+
+#endif
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //
@@ -390,67 +522,6 @@ void GLWidget::loadTiles(QString &fileName, int flag)
         m_play = true;
 }
 
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-// loadTexture:
-//
-// Loads our texture for our first set of tiles.
-//
-
-void GLWidget::loadTexture()
-{
-    QImage img(m_imgFileName);
-    QImage GL_formatted_image = QGLWidget::convertToGLFormat(img);
-
-    glGenTextures(1, &m_texture);
-
-    //bind the texture ID
-    glBindTexture(GL_TEXTURE_2D, m_texture);
-
-
-    //texture parameters
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //generate the texture
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, GL_formatted_image.width(),
-                  GL_formatted_image.height(),
-                  0, GL_RGBA, GL_UNSIGNED_BYTE, GL_formatted_image.bits() );
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-}
-
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-// loadTexture2:
-//
-// Loads our texture for our second set of tiles.
-//
-
-void GLWidget::loadTexture2()
-{
-    QImage img2(m_imgFileName2);
-    QImage GL_formatted_image2 = QGLWidget::convertToGLFormat(img2);
-
-    glGenTextures(2, &m_texture2);
-
-    //bind the texture ID
-    glBindTexture(GL_TEXTURE_2D, m_texture2);
-
-
-    //texture parameters
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    //generate the texture
-    glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, GL_formatted_image2.width(),
-                  GL_formatted_image2.height(),
-                  0, GL_RGBA, GL_UNSIGNED_BYTE, GL_formatted_image2.bits() );
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-}
-
-
 //Slot Functions:
 
 // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -524,6 +595,7 @@ void GLWidget::s_setRotate(int flag)
 
 void GLWidget::s_reset()
 {
+#if MOSAIC_VERSION
     int n_tiles = m_tiles.size();
     for(int i = 0; i < n_tiles; ++i) {
         m_tiles[i].setDepth(0);
@@ -539,5 +611,6 @@ void GLWidget::s_reset()
     m_scale = 1.0;
     m_r2    = 0.0;
     m_r22   = 0.0;
+#endif
 }
 

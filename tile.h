@@ -21,6 +21,7 @@ public:
     void        setNum(int num);
     int         num();
     void        addVertex(QVector2D &);
+    void        setVertex(int, QVector2D);
     void        setRandColor();
     float       depth();
     float       angleX();
