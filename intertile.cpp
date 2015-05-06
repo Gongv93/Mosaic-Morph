@@ -10,12 +10,12 @@
 bool comparator(const MyPair l, const MyPair r) {return (l.first < r.first);}
 
 InterTile::InterTile(){}
-InterTile::~InterTile(){};
+InterTile::~InterTile(){}
 
 void InterTile::FindSourceDest(Tile tile1, Tile tile2)
 {
-    vector<QVector2D> source;       // Tile1
-    vector<QVector2D> destination;  // Tile2
+    vector<QVector2D> source;       // source -  tile1
+    vector<QVector2D> destination;  // destination - tile2
 
     //get number of tile vertices
     int n1,n2;
@@ -27,24 +27,25 @@ void InterTile::FindSourceDest(Tile tile1, Tile tile2)
     QVector2D cen2 = tile2.centroid();
     QVector2D t = cen2 - cen1;
 
-    // Fix tile2 to have same centroid as tile1
+    // Shift tile2 to have same centroid as tile1
     for(int i = 0; i<n2 ; ++i) {
         QVector2D vtx = tile2.vertex(i);
         vtx = vtx - t;
         tile2.setVertex(i,vtx);
     }
 
-    // Find the new centroid
+    // set tile2 a new centroid
     tile2.setCentroid();
 
     // Get intersections through destination tile
     for(int i = 0; i < n1 ; ++i) {
+
         // Get first vtx and draw a line from that and the centroid
         const QVector2D vtx = tile1.vertex(i);
-        float len = (vtx - cen1).length()*10;   // Increase the length by 10 times
-        QLineF line1(cen1.x(),cen1.y(),vtx.x(),vtx.y());    // Create Line
-        line1.setLength(len);
-        int k = n2-1;   // Get last point in tile 2
+        float length = (vtx - cen1).length()*10;               // Increase the length by 10 times
+        QLineF line1(cen1.x(),cen1.y(),vtx.x(),vtx.y());    // Create Line from cent to vtx
+        line1.setLength(length);
+        int k = n2-1;                                       // Get last point in tile 2
 
         // Find which pair of vtx it intersects by going through all of them
         for (int j = 0; j < n2; ++j) {
@@ -71,10 +72,10 @@ void InterTile::FindSourceDest(Tile tile1, Tile tile2)
     for(int i = 0; i<n2; ++i) {
         // Get first vtx and draw a line from that to the centroid
         const QVector2D vtx = tile2.vertex(i);
-        float len = (vtx - cen2).length()*10;
+        float length = (vtx - cen2).length()*10;
         QLineF line1(cen2.x(),cen2.y(),vtx.x(),vtx.y());
-        line1.setLength(len);
-        int k = n1-1; //last point
+        line1.setLength(length);
+        int k = n1-1;                                       //last point in tile1
 
         // Find which pair of vtx it intersects
         for (int j = 0; j < n1; ++j) {

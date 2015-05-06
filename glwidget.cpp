@@ -13,7 +13,7 @@
 
 GLWidget::GLWidget()
 {
-    m_speedMulti      = 0.4f;   // Set angle multiplier
+    m_speedMulti      = 0.2f;   // Set angle multiplier
     m_scale           = 1.0;    // Set Scale factor
 #if MOSAIC_VERSION
     m_r2              = 0.0f;   // Set Radius 1
@@ -166,7 +166,7 @@ void GLWidget::drawTiles()
     if (m_tiles.empty() || m_tiles2.empty()) return;
 
     // Render first set of tiles
-    int n_tiles = m_tiles.size();
+    size_t n_tiles = m_tiles.size();
     for (int i = 0; i<n_tiles; ++i) {
         QVector2D centroid = m_tiles[i].centroid();
 
@@ -205,6 +205,15 @@ void GLWidget::drawTiles()
             glVertex3f(vtx.x(), vtx.y(), m_tiles[i].depth());   // assign vtx as next polygon vertex
         }
         glEnd();                                                // end polygon mode
+    // botton of the tiles
+        glBegin(GL_POLYGON);                                    // set polygon mode
+        int n_vtx2 = m_tiles[i].num();                           // get number of tile vertices
+        for(int j = 0; j<n_vtx2; ++j) {                          // visit each tile vertex
+            QVector2D vtx = m_tiles[i].vertex(j);               // assign (x,y) coords to vtx
+            glTexCoord2f(vtx.x() + 0.5, vtx.y() + 0.5);
+            glVertex3f(vtx.x(), vtx.y(), m_tiles[i].depth()-.02);   // assign vtx as next polygon vertex
+        }
+        glEnd();
 
         for(int j=0; j<n_vtx-1;j++){
                QVector2D vtx1 = m_tiles[i].vertex(j);
@@ -216,6 +225,8 @@ void GLWidget::drawTiles()
                    glVertex3f(vtx2.x(),vtx2.y(),m_tiles[i].depth()-.02);
                    glVertex3f(vtx1.x(),vtx1.y(),m_tiles[i].depth()-.02);
                 glEnd();
+
+
        }
 
         glDisable(GL_TEXTURE_2D);
@@ -224,6 +235,7 @@ void GLWidget::drawTiles()
     }
 
     // Second set of tiles
+
     n_tiles = m_tiles2.size();
     for(int i = 0; i < n_tiles; ++i) {
         glEnable(GL_TEXTURE_2D);
@@ -237,6 +249,16 @@ void GLWidget::drawTiles()
             glVertex3f(vtx.x(), vtx.y(), m_tiles2[i].depth());  // assign vtx as next polygon vertex
         }
         glEnd();                                                // end polygon mode
+
+        glBegin(GL_POLYGON);                                    // set polygon mode
+        int n_vtx3 = m_tiles2[i].num();                           // get number of tile vertices
+        for(int j = 0; j<n_vtx3; ++j) {                          // visit each tile vertex
+            QVector2D vtx = m_tiles2[i].vertex(j);               // assign (x,y) coords to vtx
+            glTexCoord2f(vtx.x() + 0.5, vtx.y() + 0.5);
+            glVertex3f(vtx.x(), vtx.y(), m_tiles2[i].depth()-.02);   // assign vtx as next polygon vertex
+        }
+        glEnd();
+
 
         for(int j=0; j<n_vtx-1;j++){
                QVector2D vtx1 = m_tiles2[i].vertex(j);
@@ -257,14 +279,13 @@ void GLWidget::drawTiles()
     if(m_morphTile.num() == 0) return;
     //if(m_tiles.empty()) return;
 
-    glColor3f(1.0,1.0,1.0);
-
     glBegin(GL_POLYGON);                                    // set polygon mode
     int n_vtx = m_morphTile.num();                           // get number of tile vertices
     for(int j = 0; j<n_vtx; ++j) {                          // visit each tile vertex
         QVector2D vtx = m_morphTile.vertex(j);
-        glVertex3f(vtx.x(), vtx.y(), 0.0);   // assign vtx as next polygon vertex
+        glVertex3f(vtx.x(), vtx.y(), 0.0);                   // assign vtx as next polygon vertex
     }
+
     glEnd();                                                // end polygon mode
 
 #endif
@@ -306,6 +327,7 @@ void GLWidget::updateTiles()
         // Increase
         case 0:
         {
+        glColor3f(0.0f, 1.0f, 0.0f);
             m_t += 0.005f * m_speedMulti;
             if(m_t >= 1.0) {
                 // Make sure it doesnt go past 1 and change state
@@ -317,6 +339,7 @@ void GLWidget::updateTiles()
         // Decrease
         case 1:
         {
+            glColor3f(0.5f, 0.0f, 1.0f);
             m_t -= 0.005f * m_speedMulti;
             if(m_t <= 0.0) {
                 // Make sure it doesnt go past 0 and change state
@@ -328,6 +351,7 @@ void GLWidget::updateTiles()
 
     Tile tempTile;
     m_interTile.InterPolate(m_t, tempTile);
+
     m_morphTile = tempTile;
 
 #endif
