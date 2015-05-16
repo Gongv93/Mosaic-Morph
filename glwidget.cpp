@@ -205,17 +205,20 @@ void GLWidget::drawTiles()
             glVertex3f(vtx.x(), vtx.y(), m_tiles[i].depth());   // assign vtx as next polygon vertex
         }
         glEnd();                                                // end polygon mode
-    // botton of the tiles
+
+        // botton of the tiles
         glBegin(GL_POLYGON);                                    // set polygon mode
-        int n_vtx2 = m_tiles[i].num();                           // get number of tile vertices
-        for(int j = 0; j<n_vtx2; ++j) {                          // visit each tile vertex
-            QVector2D vtx = m_tiles[i].vertex(j);               // assign (x,y) coords to vtx
+        int n_vtx2 = m_tiles[i].num();                          // get number of tile vertices
+        for(int j = 0; j<n_vtx2; ++j)
+        {                          // visit each tile vertex
+            QVector2D vtx = m_tiles[i].vertex(j);                 // assign (x,y) coords to vtx
             glTexCoord2f(vtx.x() + 0.5, vtx.y() + 0.5);
-            glVertex3f(vtx.x(), vtx.y(), m_tiles[i].depth()-.02);   // assign vtx as next polygon vertex
+            glVertex3f(vtx.x(), vtx.y(), m_tiles[i].depth()-.02); // assign vtx as next polygon vertex
         }
         glEnd();
 
-        for(int j=0; j<n_vtx-1;j++){
+        for(int j=0; j<n_vtx-1;j++)
+        {
                QVector2D vtx1 = m_tiles[i].vertex(j);
                QVector2D vtx2 = m_tiles[i].vertex(j+1);
 
@@ -225,8 +228,6 @@ void GLWidget::drawTiles()
                    glVertex3f(vtx2.x(),vtx2.y(),m_tiles[i].depth()-.02);
                    glVertex3f(vtx1.x(),vtx1.y(),m_tiles[i].depth()-.02);
                 glEnd();
-
-
        }
 
         glDisable(GL_TEXTURE_2D);
@@ -279,6 +280,8 @@ void GLWidget::drawTiles()
     if(m_morphTile.num() == 0) return;
     //if(m_tiles.empty()) return;
 
+    glColor3f(m_t, 1.0f, 1.0f);
+
     glBegin(GL_POLYGON);                                    // set polygon mode
     int n_vtx = m_morphTile.num();                           // get number of tile vertices
     for(int j = 0; j<n_vtx; ++j) {                          // visit each tile vertex
@@ -327,7 +330,6 @@ void GLWidget::updateTiles()
         // Increase
         case 0:
         {
-        glColor3f(0.0f, 1.0f, 0.0f);
             m_t += 0.005f * m_speedMulti;
             if(m_t >= 1.0) {
                 // Make sure it doesnt go past 1 and change state
@@ -339,7 +341,6 @@ void GLWidget::updateTiles()
         // Decrease
         case 1:
         {
-            glColor3f(0.5f, 0.0f, 1.0f);
             m_t -= 0.005f * m_speedMulti;
             if(m_t <= 0.0) {
                 // Make sure it doesnt go past 0 and change state
@@ -621,13 +622,15 @@ void GLWidget::s_reset()
 {
 #if MOSAIC_VERSION
     int n_tiles = m_tiles.size();
-    for(int i = 0; i < n_tiles; ++i) {
+    for(int i = 0; i < n_tiles; ++i)
+    {
         m_tiles[i].setDepth(0);
         m_tiles[i].setAngles(0.0, 0.0, 0.0);
     }
 
     n_tiles = m_tiles2.size();
-    for(int i = 0; i < n_tiles; ++i) {
+    for(int i = 0; i < n_tiles; ++i)
+    {
         m_tiles2[i].setDepth(2.5);
         m_tiles2[i].setAngles(0.0, 0.0, 0.0);
     }

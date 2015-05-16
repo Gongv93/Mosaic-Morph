@@ -25,12 +25,12 @@ void InterTile::FindSourceDest(Tile tile1, Tile tile2)
     // Get centroid
     QVector2D cen1 = tile1.centroid();
     QVector2D cen2 = tile2.centroid();
-    QVector2D t = cen2 - cen1;
+    QVector2D d = cen2 - cen1;
 
     // Shift tile2 to have same centroid as tile1
     for(int i = 0; i<n2 ; ++i) {
         QVector2D vtx = tile2.vertex(i);
-        vtx = vtx - t;
+        vtx = vtx - d;
         tile2.setVertex(i,vtx);
     }
 
